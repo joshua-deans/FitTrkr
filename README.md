@@ -27,7 +27,6 @@ Fork the repository and cd into to Project Directory
 
 ##### Setting up Database, make sure that database is set up
 `CREATE DATABASE fitTrkr;`
-`USE fitTrkr;`
 
 #### USE myflaskapp db using MySQL
 `USE fitTrkr;`
