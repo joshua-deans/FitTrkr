@@ -14,6 +14,8 @@ app.config['MYSQL_PASSWORD'] = DBconfig["password"]
 app.config['MYSQL_DB'] = DBconfig["DBName"]
 app.config['MYSQL_CURSORCLASS'] = DBconfig["dictDB"]
 
+# init MYSQL
+mysql = MySQL(app)
 
 # Route for landing page
 @app.route("/")
