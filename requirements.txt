@@ -1,0 +1,4 @@
+wtforms
+scrypt
+flask
+flask_mysqldb

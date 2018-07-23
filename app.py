@@ -1,6 +1,10 @@
 from flask import Flask, render_template, url_for, request, abort, redirect
 from flask_mysqldb import MySQL
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from db import DBconfig
+from os import urandom
+import scrypt
+import base64
 
 
 app = Flask(__name__)
@@ -22,10 +26,35 @@ mysql = MySQL(app)
 def base():
     return render_template('base.html')
 
+class SignupForm(Form):
+    username = StringField('Username', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')])
+    confirm = PasswordField('Confirm password', [
+        validators.DataRequired()])
+
 # Route for sign up form
-@app.route("/signup")
+
+@app.route("/signup", methods=['GET', 'POST'])
 def signup():
-    return render_template('auth/signup.html')
+    form = SignupForm(request.form)
+    if request.method == 'POST' and form.validate():
+        username = form.username.data
+        salt = urandom(16)
+        password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
+        b64_salt = base64.b64encode(salt)
+        b64_hash = base64.b64encode(password_hash)
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT INTO Users(UserName, PasswordHash, PasswordSalt) VALUES (%s, %s, %s)',
+            (username, b64_hash, b64_salt))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('login'))
+    return render_template('auth/signup.html', form=form)
 
 # Route for sign up form
 @app.route("/login")
