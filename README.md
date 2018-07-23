@@ -1,4 +1,4 @@
-# Myflaskapp
+# fitTrkr
 This is a Fitness and Workout Tracking app called fitTrkr using [Flask](https://github.com/pallets/flask) Backend with MySQL from Scratch. 
 
 =====
@@ -18,7 +18,7 @@ Fork the repository and cd into to Project Directory
 6. Set up the Database
 
 ### Run the Project
-`cd myflaskapp`
+`cd FitnessTracker`
 
 `python app.py`
 
