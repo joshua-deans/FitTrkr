@@ -8,12 +8,7 @@
 {% endblock %}
 
 {% block nav_items %}
-    <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/signup">Signup</a>
-    </li>
+
 {% endblock %}
 
 {% block body %}
@@ -21,7 +16,7 @@
         <div class="card mx-auto px-3 py-4">
             <div class="container">
                 <!-TODO: Replace John Doe with User name ->
-                <h2 class="display-5">John Doe</h2>
+                <h2 class="display-5">{{ user.FirstName }} {{ user.LastName }}</h2>
                 <!-TODO: Replace John Doe with User name ->
                 <p class="lead">Trainer</p>
             </div>

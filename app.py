@@ -1,10 +1,12 @@
-from flask import Flask, render_template, url_for, request, abort, redirect
-from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
-from db import DBconfig
-from os import urandom
-import scrypt
 import base64
+from os import urandom
+
+import scrypt
+from flask import Flask, render_template, url_for, request, redirect
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, PasswordField, validators
+
+from db import DBconfig
 
 app = Flask(__name__)
 
@@ -33,6 +35,15 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
         if 'UserID' in result:
             return True, result['UserID']
     return False, -1
+
+
+def verify_proper_user(logged_in_as, user_id):
+    if not logged_in_as[0]:
+        return False
+    if logged_in_as[1] != user_id:
+        return False
+    else:
+        return True
 
 
 # Route for landing page
