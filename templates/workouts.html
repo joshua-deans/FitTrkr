@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %} FitTracker Workouts {% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
+	  <div class="container">
+            <h1> Workouts </h1>
+            <div class="workoutsSearch">
+            
+            </div>
+            
+            <div class="workoutsList">
+                    <ul class="list-group">
+                            {% for workout in workouts %}
+                                <li class="list-group-item"><a href="workout/{{workout.workoutID}}">{{workout.workoutName}}</a></li>
+                            {% endfor %}
+                    </ul>
+            </div>
+	  </div>
+	</div>
+</div>
+
+{% endblock %}

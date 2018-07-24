@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{%block body%}
+    <div class="container">
+            <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
+              <div class="container">
+                    <div class="meal">
+                            <h1> {{meal.mealName}} </h1>
+                            <p>
+                                 {{meal.mealDescription}}
+                            </p>
+                    </div>
+              </div>
+            </div>
+        </div>
+{%endblock%}
