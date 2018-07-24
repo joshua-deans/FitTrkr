@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 DBconfig = DBconfig()
 
-# COnfigure DB
+# Configure DB
 app.config['MYSQL_HOST'] = DBconfig["host"]
 app.config['MYSQL_USER'] = DBconfig["user"]
 app.config['MYSQL_PASSWORD'] = DBconfig["password"]
@@ -119,11 +119,21 @@ def login():
 ### Delete before merging
 @app.route("/client/<int:user_id>/")
 def client(user_id):
-    return render_template('client/dashboard.html')
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT * '
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', str(user_id))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return render_template('client/dashboard.html', user=result)
+    else:
+        return redirect('/')
 
 
 @app.route("/client/<int:user_id>/plans/")
 def client_browse_plans(user_id, plan_info=None):
+    # Browse all of the fitness plans
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
@@ -136,9 +146,48 @@ def client_browse_plans(user_id, plan_info=None):
     return render_template('client/browse_plans.html', plan_info=plan_info)
 
 
-@app.route("/trainer/<int:user_id>/plans")
+@app.route("/trainer/<int:user_id>/")
 def trainer(user_id):
-    return render_template('trainer/dashboard.html')
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT * '
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainer)', str(user_id))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return render_template('client/dashboard.html', user=result)
+    else:
+        return redirect('/')
+
+
+@app.route("/trainer/<int:user_id>/all_plans/")
+def trainer_all_plans(user_id):
+    # All fitness plans made by all of the trainers
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+        'f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/browse_plans.html', plan_info=plan_info)
+
+
+@app.route("/trainer/<int:user_id>/plans/")
+def trainer_plans(user_id):
+    # Only the fitness plans made by the trainer
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+        'f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/browse_plans.html', plan_info=plan_info)
 
 
 ### Delete before merging
