@@ -44,6 +44,10 @@ def trainer():
     return render_template('trainer/dashboard.html')
 
 
+@app.route("/client/plans")
+def client_browse_plans():
+    return render_template('client/browse_plans.html')
+
 ### Delete before merging
 
 # Note: This is in debug mode. This means that it restarts with changes
