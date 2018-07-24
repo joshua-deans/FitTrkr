@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %} FitTracker Meals {% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
+	  <div class="container">
+            <h1>Meals</h1>
+            <div class="mealsSearch">
+            
+            </div>
+            
+            <div class="mealsList">
+                    <ul class="list-group">
+                        {% for meal in meals %}
+                            <li class="list-group-item"><a href="meal/{{meal.mealID}}">{{meal.mealName}}</a></li>
+                        {% endfor %}
+                    </ul>
+            </div>
+	  </div>
+	</div>
+</div>
+
+{% endblock %}

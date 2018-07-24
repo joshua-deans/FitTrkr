@@ -8,25 +8,53 @@
 
 {% block nav_items %}
 <li class="nav-item">
+    <a class="nav-link" href="/login">Dashboard</a>
+</li>   
+<li class="nav-item">
+    <a class="nav-link" href="/login">Program</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/login">MealPlans</a>
+</li>   
+<li class="nav-item">
+    <a class="nav-link" href="/login">WorkoutPlans</a>
+</li>   
+{% endblock %}
+
+{% block nav_items_right %}
+<li class="nav-item">
     <a class="nav-link" href="/login">Login</a>
 </li>
 <li class="nav-item">
     <a class="nav-link" href="/signup">Signup</a>
+</li>
+
+<li class="nav-item dropdown">
+    <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+        <!-- Search all meals by Workout name, meal name, trainer 
+        As you click each you see all the pages, then on the page 
+        itself there is a search box that would run the query-->
+        <li><a href="/workouts">Workouts</a></li> 
+        <li><a href="/meals">Meals</a></li>
+        <li><a href="/trainers">Trainers</a></li>
+    </ul>
 </li>
 {% endblock %}
 
 {% block body %}
 <div class="container">
     <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
-	  <div class="container">
-	    <h1 class="display-4">Welcome to Fitness Tracker</h1>
-	    <p class="lead"> Fitness Tracker is a service that pairs you with trainers...</p>
-	    <br>
-	    <div class="text-center">
+      <div class="container">
+        <h1 class="display-4">Welcome to Fitness Tracker</h1>
+        <p class="lead"> Fitness Tracker is a service that pairs you with trainers...</p>
+        <br>
+        <div class="text-center">
             <a class="btn btn-primary mx-3 p-2" id="login" href="/login" role="button">Login</a>
             <a class="btn btn-primary mx-3 p-2" id="signup" href="/signup" role="button">Signup</a>
-		</div>
-	  </div>
-	</div>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
