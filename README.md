@@ -86,8 +86,8 @@ CREATE TABLE Cardio
 	CardioType VARCHAR(30),
 	Primary Key (WorkoutID),
 	Foreign Key(WorkoutID) references Workouts(WorkoutID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 	);
 ```
 
@@ -99,8 +99,8 @@ CREATE TABLE Strength
 	StrengthType VARCHAR(30),
 	Primary Key (WorkoutID),
 	Foreign Key (WorkoutID) references Workouts(WorkoutID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+	    ON DELETE CASCADE
+	    ON UPDATE CASCADE
 	);
 ```
 

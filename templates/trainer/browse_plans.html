@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}Client - Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="/">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="/login">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Workout Plan</a>
+    </li>
+{% endblock %}
+
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="display-5" style="display: inline">Fitness Plans</h1>
+        <button type="button" class="btn btn-primary float-right">New Fitness Plan</button>
+        <br>
+        <br>
+        <div class="card mx-auto px-3 py-4">
+            {% if plan_info %}
+                <table class="table table-striped table-hover table-responsive-md">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Plan Description</th>
+                        <th scope="col">Trainer Name</th>
+                        <th scope="col">Program Intensity</th>
+                        <th scope="col">Program Duration</th>
+                        <th scope="col">Meal Plan</th>
+                        <th scope="col">Workout Plan</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in plan_info %}
+                        <tr>
+                            <th scope="row">{{ item['FitnessProgramID'] }}</th>
+                            <td>{{ item['Description'] }}</td>
+                            <td>{{ item['FirstName'] + " " + item['LastName'] }}</td>
+                            <td>{{ item['FP_intensity'] }}</td>
+                            <td>{{ item['Program_Length'] }}</td>
+                            <td>{{ item['MealPlanID'] }}</td>
+                            <td>{{ item['WorkoutPlanID'] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h5 class="display-5"><i>There are no plans</i></h5>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,17 +1,18 @@
-from flask import Flask, render_template, url_for, request, abort, redirect
-from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
-from db import DBconfig
-from os import urandom
-import scrypt
 import base64
+from os import urandom
 
+import scrypt
+from flask import Flask, render_template, url_for, request, redirect
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, PasswordField, validators
+
+from db import DBconfig
 
 app = Flask(__name__)
 
 DBconfig = DBconfig()
 
-# COnfigure DB
+# Configure DB
 app.config['MYSQL_HOST'] = DBconfig["host"]
 app.config['MYSQL_USER'] = DBconfig["user"]
 app.config['MYSQL_PASSWORD'] = DBconfig["password"]
@@ -20,6 +21,7 @@ app.config['MYSQL_CURSORCLASS'] = DBconfig["dictDB"]
 
 # init MYSQL
 mysql = MySQL(app)
+
 
 def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
     cookies = flask_request.cookies
@@ -34,11 +36,22 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
             return True, result['UserID']
     return False, -1
 
+
+def verify_proper_user(logged_in_as, user_id):
+    if not logged_in_as[0]:
+        return False
+    if logged_in_as[1] != user_id:
+        return False
+    else:
+        return True
+
+
 # Route for landing page
 @app.route("/")
 def base():
     logged_in_as = is_logged_in(request)
     return render_template('base.html')
+
 
 class SignupForm(Form):
     username = StringField('Username', [
@@ -50,9 +63,10 @@ class SignupForm(Form):
     confirm = PasswordField('Confirm password', [
         validators.DataRequired()])
 
+
 # Route for sign up form
 
-@app.route("/signup", methods=['GET', 'POST'])
+@app.route("/signup/", methods=['GET', 'POST'])
 def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -70,6 +84,7 @@ def signup():
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
 
+
 class LoginForm(Form):
     username = StringField('Username', [
         validators.DataRequired(),
@@ -77,8 +92,9 @@ class LoginForm(Form):
     password = PasswordField('Password', [
         validators.DataRequired()])
 
+
 # Route for sign up form
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/login/", methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -111,7 +127,79 @@ def login():
     return render_template('auth/login.html', form=form)
 
 
-    
+@app.route("/client/<int:user_id>/")
+def client(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT * '
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', str(user_id))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return render_template('client/dashboard.html', user=result, request=request)
+    else:
+        return redirect('/')
+
+
+@app.route("/client/<int:user_id>/plans/")
+def client_browse_plans(user_id, plan_info=None):
+    # Browse all of the fitness plans
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+        'f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('client/browse_plans.html', plan_info=plan_info)
+
+
+@app.route("/trainer/<int:user_id>/")
+def trainer(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT * '
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainer)', str(user_id))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return render_template('trainer/dashboard.html', user=result)
+    else:
+        return redirect('/')
+
+
+@app.route("/trainer/<int:user_id>/all_plans/")
+def trainer_all_plans(user_id):
+    # All fitness plans made by all of the trainers
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+        'f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/browse_plans.html', plan_info=plan_info)
+
+
+@app.route("/trainer/<int:user_id>/plans/")
+def trainer_plans(user_id):
+    # Only the fitness plans made by the trainer
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+        'f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/browse_plans.html', plan_info=plan_info)
+
+
 # Route for workouts
 @app.route("/workouts")
 def workouts():
@@ -126,24 +214,22 @@ def workouts():
         return render_template('workouts.html', msg=msg)
     cur.close()
 
-    return render_template('workouts.html', workouts = Workouts)
+    return render_template('workouts.html', workouts=Workouts)
+
 
 @app.route("/workout/<string:id>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM workouts WHERE id = %s," (workoutID))
+    result = cur.execute("SELECT * FROM workouts WHERE id = %s,"(workoutID))
     Workout = cur.fetchone()
-
+    cur.close()
     if result > 0:
         return render_template('workout.html', workout=Workout)
     else:
         msg = "No workouts Found"
         return render_template('workouts.html', msg=msg)
-    cur.close()
 
-    return render_template('workouts.html', workouts = Workout)
-
-
+    return render_template('workouts.html', workouts=Workout)
 
 
 # Route for meals
@@ -160,7 +246,8 @@ def meals():
         return render_template('meals.html', msg=msg)
     cur.close()
 
-    return render_template('meals.html', meals = Meals)
+    return render_template('meals.html', meals=Meals)
+
 
 # Route for single meals
 @app.route("/meal/<string:id>/")
@@ -176,13 +263,14 @@ def meal(mealID):
         return render_template('meals.html', msg=msg)
     cur.close()
 
-    return render_template('meals.html', meals = Meal)
+    return render_template('meals.html', meals=Meal)
+
 
 # Route for trainers
-@app.route("/trainers")
-def trainers():
+@app.route("/trainers_search")
+def trainers_search():
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM trainer")
+    result = cur.execute("SELECT * FROM Trainer")
     Trainers = cur.fetchall()
 
     if result > 0:
@@ -192,13 +280,14 @@ def trainers():
         return render_template('trainers.html', msg=msg)
     cur.close()
 
-    return render_template('trainers.html', trainers = Trainers)
+    return render_template('trainers.html', trainers=Trainers)
+
 
 # Route for single trainer
-@app.route("/trainer/<string:id>/")
-def trainer(trainerID):
+@app.route("/trainer_search/<string:id>/")
+def trainer_search(trainerID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM trainer WHERE id = %s", (trainerID))
+    result = cur.execute("SELECT * FROM Trainer WHERE UserID = %s", str(trainerID))
     Trainer = cur.fetchone()
 
     if result > 0:
@@ -208,10 +297,9 @@ def trainer(trainerID):
         return render_template('trainers.html', msg=msg)
     cur.close()
 
-    return render_template('trainers.html', trainers = Trainer)
+    return render_template('trainers.html', trainers=Trainer)
 
 
 # Note: This is in debug mode. This means that it restarts with changes
 if __name__ == "__main__":
     app.run(debug=True)
-

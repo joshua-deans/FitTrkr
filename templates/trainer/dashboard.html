@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}Trainer - Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="/">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ request.base_url }}plans">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Workout Plan</a>
+    </li>
+{% endblock %}
+
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="{{ request.base_url }}all_plans">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card mx-auto px-3 py-4">
+            <div class="container">
+                <!-TODO: Replace John Doe with User name ->
+                <h2 class="display-5">{{ user.FirstName }} {{ user.LastName }}</h2>
+                <!-TODO: Replace John Doe with User name ->
+                <p class="lead">Trainer</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header"><b>Recent Fitness Plans</b></div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Plan 1</li>
+                        <li class="list-group-item">Plan 2</li>
+                        <li class="list-group-item">Plan 3</li>
+                    </ul>
+                </div>
+                <br>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header"><b>Recent Clients</b></div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">John Doe</li>
+                        <li class="list-group-item">Jane Doe</li>
+                        <li class="list-group-item">Bill Bob</li>
+                    </ul>
+                </div>
+                <br>
+            </div>
+            <br>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header"><b>Recent Logs</b></div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Log 44</li>
+                        <li class="list-group-item">Log 43</li>
+                        <li class="list-group-item">Log 42</li>
+                    </ul>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+{% endblock %}
