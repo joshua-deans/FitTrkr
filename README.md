@@ -155,7 +155,8 @@ CREATE TABLE Users
 	UserName VARCHAR(30) UNIQUE,
 	FirstName VARCHAR(30),
 	LastName VARCHAR(30),
-	PasswordHash VARCHAR(50),
+	PasswordHash CHAR(64),
+	PasswordSalt CHAR(32),
 	Gender VARCHAR(10),
 	Age INT(11),
 	Address VARCHAR(100),
@@ -163,6 +164,18 @@ CREATE TABLE Users
 	Primary Key (UserID),
 	Foreign Key(PostalCode) references PostalCode(PostalCode)
 		ON DELETE NO ACTION 
+		ON UPDATE CASCADE
+	);
+```
+
+```
+CREATE TABLE Session
+(
+	UserID INT(11) AUTO_INCREMENT,
+	Token CHAR(128),
+	Primary Key (UserID, Token),
+	Foreign Key(UserID) references Users(UserID)
+		ON DELETE CASCADE
 		ON UPDATE CASCADE
 	);
 ```
