@@ -35,6 +35,7 @@ Fork the repository and cd into to Project Directory
 CREATE TABLE MealPlan
 	(
 	MealPlanID    	INT(11) AUTO_INCREMENT,
+	MealPlanName 	VARCHAR(30),
 	Category    	VARCHAR(50),
 	DietaryRestrictions	 VARCHAR(200),
 	MealPlanDescription	 VARCHAR(500),
@@ -59,6 +60,7 @@ CREATE TABLE Meals
 CREATE TABLE WorkoutPlan
 	(
 	WorkoutPlanID INT(11) AUTO_INCREMENT,
+	WorkoutPlanName VARCHAR(30),
 	Intensity    	VARCHAR(30),
 	PlanDescription	VARCHAR(500),
 	Primary Key (WorkoutPlanID)
@@ -211,6 +213,7 @@ CREATE TABLE Trainer
 CREATE TABLE FitnessProgram
 	(
 	FitnessProgramID INT(11) AUTO_INCREMENT,
+	FitnessProgramName VARCHAR(30);
 	FP_intensity VARCHAR(50),
 	Description VARCHAR(400),
 	Program_Length VARCHAR(20),
