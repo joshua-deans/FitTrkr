@@ -32,6 +32,20 @@ def signup():
 def login():
     return render_template('auth/login.html')
 
+
+### Delete before merging
+@app.route("/client")
+def client():
+    return render_template('client/dashboard.html')
+
+
+@app.route("/trainer")
+def trainer():
+    return render_template('trainer/dashboard.html')
+
+
+### Delete before merging
+
 # Note: This is in debug mode. This means that it restarts with changes
 if __name__ == "__main__":
     app.run(debug=True)

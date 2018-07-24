@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}Client - Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/signup">Signup</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card mx-auto px-3 py-4">
+            <div class="container">
+                <!-TODO: Replace John Doe with User name ->
+                <h2 class="display-5">John Doe</h2>
+                <!-TODO: Replace John Doe with User name ->
+                <p class="lead">Your current workout plan is: <b>Starting Strength</b></p>
+                <p>Trained by: <i>Trainer Name</i></p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Today's meals</h5>
+                        <ul>
+                            <li>Broccoli</li>
+                            <li>Pizza</li>
+                            <li>Salad</li>
+                        </ul>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Today's workouts</h5>
+                        <ul>
+                            <li>Deadlifts</li>
+                            <li>Squats</li>
+                            <li>Bench</li>
+                        </ul>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <br>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Logs</h5>
+                        <ul>
+                            <li>Log 44</li>
+                            <li>Log 43</li>
+                            <li>Log 42</li>
+                        </ul>
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+{% endblock %}
