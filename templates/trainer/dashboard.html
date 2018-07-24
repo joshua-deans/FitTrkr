@@ -9,7 +9,7 @@
 
 {% block nav_items %}
     <li class="nav-item">
-        <a class="nav-link" href="{{ request.base_url }}">Dashboard</a>
+        <a class="nav-link" href="/">Dashboard</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="{{ request.base_url }}plans">Program</a>
@@ -34,7 +34,7 @@
             <!-- Search all meals by Workout name, meal name, trainer
             As you click each you see all the pages, then on the page
             itself there is a search box that would run the query-->
-            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="{{ request.base_url }}all_plans">Programs</a></li>
             <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
             <li><a class="dropdown-item" href="/meals">Meals</a></li>
             <li><a class="dropdown-item" href="/trainers">Trainers</a></li>

@@ -165,7 +165,7 @@ def trainer(user_id):
     result = cur.fetchone()
     cur.close()
     if result:
-        return render_template('client/dashboard.html', user=result)
+        return render_template('trainer/dashboard.html', user=result)
     else:
         return redirect('/')
 

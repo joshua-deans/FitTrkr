@@ -6,6 +6,21 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/auth_style.css') }}">
 {% endblock %}
 
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Workout Plan</a>
+    </li>
+{% endblock %}
+
 {% block nav_items_right %}
     <li class="nav-item">
         <a class="nav-link" href="/login">Login</a>
@@ -14,18 +29,18 @@
         <a class="nav-link active" href="/signup">Signup</a>
     </li>
 
-    {#<li class="nav-item dropdown">#}
-    {#    <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>#}
-    {#    <span class="caret"></span></a>#}
-    {#    <ul class="dropdown-menu">#}
-    {#        <!-- Search all meals by Workout name, meal name, trainer #}
-    {#        As you click each you see all the pages, then on the page #}
-    {#        itself there is a search box that would run the query-->#}
-    {#        <li><a href="/workouts">Workouts</a></li> #}
-    {#        <li><a href="/meals">Meals</a></li>#}
-    {#        <li><a href="/trainers">Trainers</a></li>#}
-    {#    </ul>#}
-    {#</li>#}
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
 {% endblock %}
 
 {% block body %}
