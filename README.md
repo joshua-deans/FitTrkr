@@ -169,6 +169,18 @@ CREATE TABLE Users
 ```
 
 ```
+CREATE TABLE Session
+(
+	UserID INT(11) AUTO_INCREMENT,
+	Token CHAR(128),
+	Primary Key (UserID, Token),
+	Foreign Key(UserID) references Users(UserID)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+	);
+```
+
+```
 CREATE TABLE Clients
 (
 	UserID INT(11) AUTO_INCREMENT,
