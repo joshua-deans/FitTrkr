@@ -8,12 +8,43 @@
 {% endblock %}
 
 {% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ request.base_url }}">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/login">Workout Plan</a>
+    </li>
+{% endblock %}
 
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
 {% endblock %}
 
 {% block body %}
     <div class="container-fluid">
-        <h1 class="display-5" style="display: inline">All Fitness Plans</h1>
+        <h1 class="display-5" style="display: inline">Fitness Plans</h1>
         <button type="button" class="btn btn-primary float-right">New Fitness Plan</button>
         <br>
         <br>

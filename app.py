@@ -1,11 +1,12 @@
-from flask import Flask, render_template, url_for, request, abort, redirect
-from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
-from db import DBconfig
-from os import urandom
-import scrypt
 import base64
+from os import urandom
 
+import scrypt
+from flask import Flask, render_template, url_for, request, redirect
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, PasswordField, validators
+
+from db import DBconfig
 
 app = Flask(__name__)
 
@@ -126,7 +127,6 @@ def login():
     return render_template('auth/login.html', form=form)
 
 
-### Delete before merging
 @app.route("/client/<int:user_id>/")
 def client(user_id):
     cur = mysql.connection.cursor()
@@ -136,7 +136,7 @@ def client(user_id):
     result = cur.fetchone()
     cur.close()
     if result:
-        return render_template('client/dashboard.html', user=result)
+        return render_template('client/dashboard.html', user=result, request=request)
     else:
         return redirect('/')
 
@@ -214,24 +214,22 @@ def workouts():
         return render_template('workouts.html', msg=msg)
     cur.close()
 
-    return render_template('workouts.html', workouts = Workouts)
+    return render_template('workouts.html', workouts=Workouts)
+
 
 @app.route("/workout/<string:id>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM workouts WHERE id = %s," (workoutID))
+    result = cur.execute("SELECT * FROM workouts WHERE id = %s,"(workoutID))
     Workout = cur.fetchone()
-
+    cur.close()
     if result > 0:
         return render_template('workout.html', workout=Workout)
     else:
         msg = "No workouts Found"
         return render_template('workouts.html', msg=msg)
-    cur.close()
 
-    return render_template('workouts.html', workouts = Workout)
-
-
+    return render_template('workouts.html', workouts=Workout)
 
 
 # Route for meals
@@ -248,7 +246,8 @@ def meals():
         return render_template('meals.html', msg=msg)
     cur.close()
 
-    return render_template('meals.html', meals = Meals)
+    return render_template('meals.html', meals=Meals)
+
 
 # Route for single meals
 @app.route("/meal/<string:id>/")
@@ -264,13 +263,14 @@ def meal(mealID):
         return render_template('meals.html', msg=msg)
     cur.close()
 
-    return render_template('meals.html', meals = Meal)
+    return render_template('meals.html', meals=Meal)
+
 
 # Route for trainers
 @app.route("/trainers_search")
-def trainers():
+def trainers_search():
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM trainer")
+    result = cur.execute("SELECT * FROM Trainer")
     Trainers = cur.fetchall()
 
     if result > 0:
@@ -280,13 +280,14 @@ def trainers():
         return render_template('trainers.html', msg=msg)
     cur.close()
 
-    return render_template('trainers.html', trainers = Trainers)
+    return render_template('trainers.html', trainers=Trainers)
+
 
 # Route for single trainer
 @app.route("/trainer_search/<string:id>/")
-def trainer(trainerID):
+def trainer_search(trainerID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM trainer WHERE id = %s", (trainerID))
+    result = cur.execute("SELECT * FROM Trainer WHERE UserID = %s", str(trainerID))
     Trainer = cur.fetchone()
 
     if result > 0:
@@ -296,7 +297,7 @@ def trainer(trainerID):
         return render_template('trainers.html', msg=msg)
     cur.close()
 
-    return render_template('trainers.html', trainers = Trainer)
+    return render_template('trainers.html', trainers=Trainer)
 
 
 # Note: This is in debug mode. This means that it restarts with changes
