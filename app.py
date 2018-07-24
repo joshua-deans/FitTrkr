@@ -127,6 +127,9 @@ def login():
     return render_template('auth/login.html', form=form)
 
 
+# CLIENT ROUTES
+
+
 @app.route("/client/<int:user_id>/")
 def client(user_id):
     cur = mysql.connection.cursor()
@@ -154,6 +157,9 @@ def client_browse_plans(user_id, plan_info=None):
         plan_info = result
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info)
+
+
+# TRAINER ROUTES
 
 
 @app.route("/trainer/<int:user_id>/")
@@ -200,11 +206,42 @@ def trainer_plans(user_id):
     return render_template('trainer/browse_plans.html', plan_info=plan_info)
 
 
+@app.route("/trainer/<int:user_id>/meal_plans/")
+def trainer_meal_plans(user_id):
+    # Only the meal plans made by the trainer
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT m.MealPlanID, m.Category, m.DietaryRestrictions, m.MealPlanDescription, '
+        'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
+        'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
+    result = cur.fetchall()
+    print(result);
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/meal_plans.html', meal_plan_info=plan_info)
+
+
+@app.route("/trainer/<int:user_id>/workout_plans/")
+def trainer_workout_plans(user_id):
+    # Only the meal plans made by the trainer
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT w.WorkoutPlanID, w.Intensity, w.PlanDescription, '
+        'f.FitnessProgramID FROM FitnessProgram f, WorkoutPlan w, Users u WHERE f.TrainerID = u.UserID AND '
+        'w.WorkoutPlanID = f.WorkoutPlanID AND u.UserID = %s', str(user_id))
+    result = cur.fetchall()
+    if result:
+        plan_info = result
+    cur.close()
+    return render_template('trainer/workout_plans.html', workout_plan_info=plan_info)
+
+
 # Route for workouts
 @app.route("/workouts")
 def workouts():
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM workouts")
+    result = cur.execute("SELECT * FROM Workouts")
     Workouts = cur.fetchall()
 
     if result > 0:
