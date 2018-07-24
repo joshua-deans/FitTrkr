@@ -1,18 +1,9 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Log In{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/auth_style.css') }}">
-{% endblock %}
-
-{% block nav_items %}
-<li class="nav-item">
-    <a class="nav-link active" href="/login">Login</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/signup">Signup</a>
-</li>
 {% endblock %}
 
 {% block body %}
