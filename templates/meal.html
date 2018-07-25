@@ -1,16 +1,28 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
+
+{% block title %} Meal {% endblock %}
 
 {%block body%}
-    <div class="container">
-            <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
-              <div class="container">
-                    <div class="meal">
-                            <h1> {{meal.mealName}} </h1>
-                            <p>
-                                 {{meal.mealDescription}}
-                            </p>
-                    </div>
-              </div>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
+        <div class="container">
+            <div class="meal">
+                <h1> {{meal.MealName}} </h1>
+                <br>
+                <p>
+                    <b>Type:</b> {{meal.MealType}}
+                </p>
+                <p>
+                    <b>Calories Per Serving:</b> {{meal.CaloriesPerServing}}
+                </p>
+                <p>
+                    <b>Description:</b> {{meal.MealDescription}}
+                </p>
+                <p>
+                    <a href="/meals">Go back</a>
+                </p>
             </div>
         </div>
+    </div>
+</div>
 {%endblock%}
