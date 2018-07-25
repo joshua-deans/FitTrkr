@@ -139,7 +139,7 @@ def client(user_id):
     result = cur.fetchone()
     cur.close()
     if result:
-        return render_template('client/dashboard.html', user=result, request=request)
+        return render_template('client/dashboard.html', user=result, request=request, user_id=user_id)
     else:
         return redirect('/')
 
@@ -156,7 +156,7 @@ def client_browse_plans(user_id, plan_info=None):
     if result:
         plan_info = result
     cur.close()
-    return render_template('client/browse_plans.html', plan_info=plan_info)
+    return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
 # TRAINER ROUTES
@@ -171,7 +171,7 @@ def trainer(user_id):
     result = cur.fetchone()
     cur.close()
     if result:
-        return render_template('trainer/dashboard.html', user=result)
+        return render_template('trainer/dashboard.html', user=result, user_id=user_id)
     else:
         return redirect('/')
 
@@ -188,7 +188,7 @@ def trainer_all_plans(user_id):
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/browse_plans.html', plan_info=plan_info)
+    return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
 @app.route("/trainer/<int:user_id>/plans/")
@@ -203,7 +203,7 @@ def trainer_plans(user_id):
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/browse_plans.html', plan_info=plan_info)
+    return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
 @app.route("/trainer/<int:user_id>/meal_plans/")
@@ -219,7 +219,7 @@ def trainer_meal_plans(user_id):
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/meal_plans.html', meal_plan_info=plan_info)
+    return render_template('trainer/meal_plans.html', meal_plan_info=plan_info, user_id=user_id)
 
 
 @app.route("/trainer/<int:user_id>/workout_plans/")
@@ -234,7 +234,7 @@ def trainer_workout_plans(user_id):
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/workout_plans.html', workout_plan_info=plan_info)
+    return render_template('trainer/workout_plans.html', workout_plan_info=plan_info, user_id=user_id)
 
 
 # Route for workouts
