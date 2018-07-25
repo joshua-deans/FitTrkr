@@ -101,31 +101,37 @@ def login():
     if request.method == 'POST' and form.validate():
         username = form.username.data
         cur = mysql.connection.cursor()
-        cur.execute(
+        user_check = cur.execute(
             'SELECT UserID, PasswordHash, PasswordSalt FROM Users WHERE UserName = %s',
             (username,))
         result = cur.fetchone()
-        db_hash = base64.b64decode(result['PasswordHash'])
-        salt = base64.b64decode(result['PasswordSalt'])
-        password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
-        if password_hash == db_hash:
-            token = base64.b64encode(urandom(64))
-            user_id = result['UserID']
-            cur.execute(
-                'INSERT INTO Session(UserID, Token) VALUES (%s, %s)',
-                (user_id, token))
-            mysql.connection.commit()
-            cur.close()
-            resp = redirect(url_for('base'))
-            resp.set_cookie(
-                'token',
-                token,
-                86400,
-                domain='127.0.0.1',
-                # secure=True,
-                httponly=True)
-            flash('You are now logged in', 'success')
-            return resp
+        if user_check >0:
+            db_hash = base64.b64decode(result['PasswordHash'])
+            salt = base64.b64decode(result['PasswordSalt'])
+            password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
+            if password_hash == db_hash:
+                app.logger.info('PASSWORD MATCHED')
+                token = base64.b64encode(urandom(64))
+                user_id = result['UserID']
+                cur.execute(
+                    'INSERT INTO Session(UserID, Token) VALUES (%s, %s)',
+                    (user_id, token))
+                mysql.connection.commit()
+                cur.close()
+                resp = redirect(url_for('base'))
+                resp.set_cookie(
+                    'token',
+                    token,
+                    86400,
+                    domain='127.0.0.1',
+                    # secure=True,
+                    httponly=True)
+                flash('You are now logged in', 'success')
+                return resp
+            else:
+                app.logger.info('PASSWORD NOT MATCHED')
+        else:
+            app.logger.info('NO USER')
     return render_template('auth/login.html', form=form)
 
 
@@ -233,7 +239,7 @@ def trainer_meal_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
-    print(result);
+    print(result)
     if result:
         plan_info = result
     cur.close()
