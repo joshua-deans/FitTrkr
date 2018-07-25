@@ -1,14 +1,28 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
+{% block title %} Workout {% endblock %}
+
+{%block body%}
 <div class="container">
     <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
         <div class="container">
-            <div class="trainer">
-                    <h1> {{workout.workoutID}} </h1>
-                    <p>
-                            {{workout.workoutDescription}}
-                    </p>
+            <div class="workout">
+                <h1> {{workout.WorkoutName}} </h1>
+                <br>
+                <p>
+                    <b>Intensity:</b> {{workout.Intensity}}
+                </p>
+                <p>
+                    <b>Description:</b> {{workout.WorkoutDescription}}
+                </p>
+                <p>
+                    <b>Equipment:</b> {{workout.Equipment}}
+                </p>
+                <p>
+                    <a href="/workouts">Go back</a>
+                </p>
             </div>
         </div>
     </div>
 </div>
+{%endblock%}

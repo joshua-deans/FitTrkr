@@ -9,16 +9,16 @@
 
 {% block nav_items %}
     <li class="nav-item">
-        <a class="nav-link" href="/">Dashboard</a>
+        <a class="nav-link" href="{{ url_for('trainer', user_id=user_id) }}">Dashboard</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/login">Programs</a>
+        <a class="nav-link" href="{{ url_for('trainer_plans', user_id=user_id) }}">Program</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/login">Meal Plans</a>
+        <a class="nav-link" href="{{ url_for('trainer_meal_plans', user_id=user_id) }}">Meal Plan</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/login">Workout Plans</a>
+        <a class="nav-link active" href="{{ url_for('trainer_workout_plans', user_id=user_id) }}">Workout Plan</a>
     </li>
 {% endblock %}
 

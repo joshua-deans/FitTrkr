@@ -198,7 +198,7 @@ CREATE TABLE Clients
 ```
 
 ```
-CREATE TABLE Trainer
+CREATE TABLE Trainers
 (
 	UserID INT(11) AUTO_INCREMENT,
 	TrainerFocus VARCHAR(300),
