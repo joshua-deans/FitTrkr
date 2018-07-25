@@ -144,7 +144,7 @@ def client(user_id):
         return redirect('/')
 
 
-@app.route("/client/<int:user_id>/plans/")
+@app.route("/client/<int:user_id>/programs/")
 def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
@@ -157,6 +157,22 @@ def client_browse_plans(user_id, plan_info=None):
         plan_info = result
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
+
+
+@app.route("/client/<int:user_id>/logs/")
+def client_logs(user_id, log_info=None):
+    # Browse all of the fitness plans
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
+        'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
+        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
+    result = cur.fetchall()
+    print(result)
+    if result:
+        log_info = result
+    cur.close()
+    return render_template('client/client_logs.html', log_info=log_info, user_id=user_id)
 
 
 # TRAINER ROUTES
@@ -176,7 +192,7 @@ def trainer(user_id):
         return redirect('/')
 
 
-@app.route("/trainer/<int:user_id>/all_plans/")
+@app.route("/trainer/<int:user_id>/all_programs/")
 def trainer_all_plans(user_id):
     # All fitness plans made by all of the trainers
     cur = mysql.connection.cursor()
@@ -191,7 +207,7 @@ def trainer_all_plans(user_id):
     return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
-@app.route("/trainer/<int:user_id>/plans/")
+@app.route("/trainer/<int:user_id>/programs/")
 def trainer_plans(user_id):
     # Only the fitness plans made by the trainer
     cur = mysql.connection.cursor()
