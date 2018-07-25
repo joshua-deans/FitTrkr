@@ -185,7 +185,7 @@ def trainer(user_id):
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT * '
-        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainer)', str(user_id))
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', str(user_id))
     result = cur.fetchone()
     cur.close()
     if result:
@@ -263,7 +263,7 @@ def workouts():
         WorkoutName = request.form['WorkoutName']
         WorkoutNamePassed = '%' + WorkoutName + '%' 
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM workouts WHERE WorkoutName LIKE %s " , [WorkoutNamePassed] )
+        result = cur.execute("SELECT * FROM Workouts WHERE WorkoutName LIKE %s ", [WorkoutNamePassed])
         Workouts = cur.fetchall()
 
         if result > 0:
@@ -291,7 +291,7 @@ def workouts():
 @app.route("/workout/<string:workoutID>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM workouts WHERE WorkoutID = %s", (workoutID))
+    result = cur.execute("SELECT * FROM Workouts WHERE WorkoutID = %s", (workoutID))
     Workout = cur.fetchone()
     cur.close()
     if result > 0:
@@ -304,14 +304,14 @@ def workout(workoutID):
 
 
 # Route for meals
-@app.route("/meals", methods=['GET', 'POST'])
+@app.route("/meals/", methods=['GET', 'POST'])
 def meals():
     if request.method == 'POST':
         #Get Form Fields
         MealName = request.form['MealName']
         MealNamePassed = '%' + MealName + '%' 
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM meals WHERE MealName LIKE %s " , [MealNamePassed] )
+        result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
         Meals = cur.fetchall()
 
         if result > 0:
@@ -323,7 +323,7 @@ def meals():
 
     else: 
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM meals")
+        result = cur.execute("SELECT * FROM Meals")
         Meals = cur.fetchall()
 
         if result > 0:
@@ -340,7 +340,7 @@ def meals():
 @app.route("/meal/<string:mealID>/")
 def meal(mealID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM meals WHERE MealID = %s", (mealID))
+    result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID))
     Meal = cur.fetchone()
 
     if result > 0:
