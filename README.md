@@ -215,7 +215,7 @@ CREATE TABLE Trainers
 CREATE TABLE FitnessProgram
 	(
 	FitnessProgramID INT(11) AUTO_INCREMENT,
-	FitnessProgramName VARCHAR(30);
+	FitnessProgramName VARCHAR(30),
 	FP_intensity VARCHAR(50),
 	Description VARCHAR(400),
 	Program_Length VARCHAR(20),
