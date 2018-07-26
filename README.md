@@ -184,24 +184,6 @@ CREATE TABLE Session
 	);
 ```
 
-```
-CREATE TABLE Clients
-(
-	UserID INT(11),
-	Height DOUBLE,
-	Weight DOUBLE,
-	PrimaryGoals VARCHAR(300),
-	FitnessLevel VARCHAR(140),
-	Current_FitnessProgram INT(11),
-	Primary Key(UserID),
-	Foreign Key(UserID) references Users(UserID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	Foreign Key(Current_FitnessProgram) references FitnessProgram(FitnessProgramID)
-	    ON DELETE CASCADE
-	    ON UPDATE CASCADE
-	);
-```
 
 ```
 CREATE TABLE Trainers
@@ -238,7 +220,24 @@ CREATE TABLE FitnessProgram
         ON UPDATE CASCADE
 	);
 ```
-
+```
+CREATE TABLE Clients
+(
+	UserID INT(11),
+	Height DOUBLE,
+	Weight DOUBLE,
+	PrimaryGoals VARCHAR(300),
+	FitnessLevel VARCHAR(140),
+	Current_FitnessProgram INT(11),
+	Primary Key(UserID),
+	Foreign Key(UserID) references Users(UserID)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	Foreign Key(Current_FitnessProgram) references FitnessProgram(FitnessProgramID)
+	    ON DELETE CASCADE
+	    ON UPDATE CASCADE
+	);
+```
 ```
 CREATE TABLE Logs
 	(
