@@ -288,6 +288,26 @@ def workouts():
     return render_template('workouts.html', workouts=Workouts)
 
 
+# Route for adding workouts
+@app.route("/add_workout", methods=['POST'])
+def add_workout():
+    if request.method == 'POST':
+        # Get Form Fields
+        print(request.form)
+        workout_name = request.form.get('workout-name')
+        workout_intensity = request.form.get('workout-intensity')
+        workout_equipment = request.form.get('workout-equipment')
+        workout_description = request.form.get('workout-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Workouts(Intensity, WorkoutDescription, Equipment, WorkoutName) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (workout_intensity, workout_description, workout_equipment, workout_name))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('workouts'))
+
+
 @app.route("/workout/<string:workoutID>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
@@ -334,6 +354,26 @@ def meals():
         cur.close()
 
     return render_template('meals.html', meals=Meals)
+
+
+# Route for adding meals
+@app.route("/add_meal", methods=['POST'])
+def add_meal():
+    if request.method == 'POST':
+        # Get Form Fields
+        meal_name = request.form.get('meal-name')
+        meal_type = request.form.get('meal-type')
+        calories = request.form.get('calories')
+        dietary_restrictions = request.form.get('dietary-restrictions')
+        meal_description = request.form.get('meal-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Meals(MealName, MealType, CaloriesPerServing, DietaryRestrictions, MealDescription) "
+                    "VALUES (%s, %s, %s, %s, %s)",
+                    (meal_name, meal_type, calories, dietary_restrictions, meal_description))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('meals'))
 
 
 # Route for single meals

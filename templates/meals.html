@@ -3,66 +3,102 @@
 {% block title %} FitTracker Meals {% endblock %}
 
 {% block body %}
-<div class="container">
+    <div class="container">
         <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
-                <div class="container">
-                        <nav class="nav">                                
-                                <a class="px-2 nav-link" href="/trainers_search"><h1> Trainers </h1></a>
-                                <h1 class="px-2 nav-link active">Meals</h1> 
-                                <a class="px-2 nav-link" href="/workouts"> <h1>Workouts</h1></a>
-                        </div>
-
-
-                        <div class="container-fluid mealsList">
-                                <div class="mealsSearch">
-                                        <!-- Search form -->
-                                        <form action="" method="POST">
-                                                <div class="md-form">
-                                                        <form method="POST" action="" accept-charset="utf-8">
-                                                            <label>Search Meal</label>
-                                                            <input class="form-control" type="text" name="MealName" pattern="[^'\x22]+" placeholder="Search Meals by Name" aria-label="Search" value={{request.form.MealName}} >
-                                                            <button type="submit" class="btn btn-primary">Search</button>
-                                                        </form>  
-                                                </div>
-                                        </form>
-                               </div>
-                                <br>
-                                <div class="card mx-auto px-3 py-4">
-                                        {% if meals %}
-                                        <table class="table table-striped table-hover table-responsive-md">
-                                                <thead>
-                                                        <tr>
-                                                                <th scope="col">Meal ID</th>
-                                                                <th scope="col">Meal Type</th>
-                                                                <th scope="col">Meal Name</th>
-                                                                <th scope="col">Description</th>
-                                                                <th scope="col">Dietary Restrictions</th>
-                                                                <th scope="col">Calories Per Serving</th>
-                                                        </tr>
-                                                </thead>
-                                                <tbody>
-                                                        {% for meal in meals %}
-                                                        <tr>
-                                                                <th scope="row"><a href="meal/{{meal.MealID}}/">{{ meal['MealID'] }}</a></th>
-                                                                <td>{{ meal['MealType'] }}</td>
-                                                                <td>{{ meal['MealName'] }}</td>
-                                                                <td>{{ meal['MealDescription'] }}</td>
-                                                                <td>{{ meal['DietaryRestrictions'] }}</td>
-                                                                <td>{{ meal['CaloriesPerServing'] }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                </tbody>
-                                        </table>
-                                        {% else %}
-                                        <h5 class="display-5">
-                                                <i>No meals found</i>
-                                        </h5>
-                                        {% endif %}
-                                </div>
-
-                        </div>
+            <div class="container">
+                <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#mealForm">
+                    <i class="fas fa-plus"></i>&nbsp;Add Meal
+                </button>
+                <nav class="nav">
+                    <a class="px-2 nav-link" href="/trainers_search"><h1> Trainers </h1></a>
+                    <h1 class="px-2 nav-link active">Meals</h1>
+                    <a class="px-2 nav-link" href="/workouts"><h1>Workouts</h1></a>
+                </nav>
+                <div class="container-fluid mealsList">
+                    <div class="mealsSearch">
+                        <!-- Search form -->
+                        <form action="" method="POST">
+                            <div class="md-form">
+                                <form method="POST" action="" accept-charset="utf-8">
+                                    <label>Search Meal</label>
+                                    <input class="form-control" type="text" name="MealName" pattern="[^'\x22]+"
+                                           placeholder="Search Meals by Name" aria-label="Search"
+                                           value={{ request.form.MealName }}>
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </form>
+                            </div>
+                        </form>
+                    </div>
+                    <br>
+                    <div class="card mx-auto px-3 py-4">
+                        {% if meals %}
+                            <table class="table table-striped table-hover table-responsive-md">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Meal ID</th>
+                                    <th scope="col">Meal Type</th>
+                                    <th scope="col">Meal Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Dietary Restrictions</th>
+                                    <th scope="col">Calories Per Serving</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for meal in meals %}
+                                    <tr>
+                                        <th scope="row"><a href="meal/{{ meal.MealID }}/">{{ meal['MealID'] }}</a></th>
+                                        <td>{{ meal['MealType'] }}</td>
+                                        <td>{{ meal['MealName'] }}</td>
+                                        <td>{{ meal['MealDescription'] }}</td>
+                                        <td>{{ meal['DietaryRestrictions'] }}</td>
+                                        <td>{{ meal['CaloriesPerServing'] }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <h5 class="display-5">
+                                <i>No meals found</i>
+                            </h5>
+                        {% endif %}
+                    </div>
                 </div>
+            </div>
         </div>
-</div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="mealForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form method="post" action="/add_meal">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">New Meal</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="meal-name" class="col-form-label">Meal Name:</label>
+                        <input type="text" class="form-control" name="meal-name" id="meal-name" required>
+                        <label for="meal-type" class="col-form-label">Meal Type:</label>
+                        <input type="text" class="form-control" name="meal-type" id="meal-type" required>
+                        <label for="calories" class="col-form-label">Calories Per Serving:</label>
+                        <input type="number" class="form-control" name="calories" id="calories" required>
+                        <label for="dietary-restrictions" class="col-form-label">Dietary Restrictions</label>
+                        <input type="text" class="form-control" name="dietary-restrictions" id="dietary-restrictions">
+                        <label for="meal-description" class="col-form-label">Meal Description:</label>
+                        <textarea class="form-control" name="meal-description" id="meal-description"
+                                  required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
