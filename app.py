@@ -274,7 +274,7 @@ def trainer_meal_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
-    print(result);
+    print(result)
     if result:
         plan_info = result
     cur.close()
