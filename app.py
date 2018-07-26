@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 from os import urandom
 
 import scrypt
@@ -36,6 +37,20 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
             return True, result['UserID']
     return False, -1
 
+def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
+    cookies = flask_request.cookies
+    if 'token' in cookies:
+        token = cookies.get('token')
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT UserID FROM Session WHERE Token = %s',
+            (token,))
+        result = cur.fetchone()
+        if 'UserID' in result:
+            return True
+    return False
+
+app.jinja_env.globals.update(is_logged_in_bool=is_logged_in_bool)
 
 def verify_proper_user(logged_in_as, user_id):
     if not logged_in_as[0]:
@@ -49,7 +64,6 @@ def verify_proper_user(logged_in_as, user_id):
 # Route for landing page
 @app.route("/")
 def base():
-    logged_in_as = is_logged_in(request)
     return render_template('base.html')
 
 
@@ -85,6 +99,9 @@ def signup():
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
 
+@app.route("/settings/", methods=['GET', 'POST'])
+def settings():
+    return redirect(url_for('base'))
 
 class LoginForm(Form):
     username = StringField('Username', [
@@ -129,11 +146,29 @@ def login():
                 flash('You are now logged in', 'success')
                 return resp
             else:
+                flash('Invalid Password, Try again', 'danger')
                 app.logger.info('PASSWORD NOT MATCHED')
         else:
+            flash('Invalid Username, Try again', 'danger')
             app.logger.info('NO USER')
     return render_template('auth/login.html', form=form)
 
+@app.route("/logout/")
+def logout():
+    resp = redirect(url_for('base'))
+    if is_logged_in(request)[0]:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'DELETE FROM Session WHERE Token = %s',
+            (request.cookies.get('token'),))
+        mysql.connection.commit()
+        cur.close()
+        resp.set_cookie(
+            'token',
+            '',
+            expires='Thu, 01 Jan 1970 00:00:00 GMT'
+        )
+    return resp
 
 # CLIENT ROUTES
 
