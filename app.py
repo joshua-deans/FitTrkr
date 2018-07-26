@@ -1,5 +1,4 @@
 import base64
-from datetime import datetime
 from os import urandom
 
 import scrypt
@@ -447,20 +446,51 @@ def workouts():
     return render_template('workouts.html', workouts=Workouts)
 
 
-# Route for adding workouts
-@app.route("/add_workout", methods=['POST'])
-def add_workout():
+# Route for adding strength workouts
+@app.route("/add_strength_workout", methods=['POST'])
+def add_strength_workout():
     if request.method == 'POST':
         # Get Form Fields
         print(request.form)
-        workout_name = request.form.get('workout-name')
-        workout_intensity = request.form.get('workout-intensity')
-        workout_equipment = request.form.get('workout-equipment')
-        workout_description = request.form.get('workout-description')
+        workout_name = request.form.get('strength-workout-name')
+        workout_intensity = request.form.get('strength-workout-intensity')
+        workout_equipment = request.form.get('strength-workout-equipment')
+        workout_body_part = request.form.get('strength-body-part')
+        workout_strength_type = request.form.get('strength-type')
+        workout_description = request.form.get('strength-workout-description')
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO Workouts(Intensity, WorkoutDescription, Equipment, WorkoutName) "
                     "VALUES (%s, %s, %s, %s)",
                     (workout_intensity, workout_description, workout_equipment, workout_name))
+        cur.execute("INSERT INTO Strength(WorkoutID, BodyPart, StrengthType) "
+                    "VALUES (%s, %s, %s)",
+                    (cur.lastrowid, workout_body_part, workout_strength_type))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('workouts'))
+
+
+# Route for adding cardio workouts
+@app.route("/add_cardio_workout", methods=['POST'])
+def add_cardio_workout():
+    if request.method == 'POST':
+        # Get Form Fields
+        print(request.form)
+        workout_name = request.form.get('cardio-workout-name')
+        workout_intensity = request.form.get('cardio-workout-intensity')
+        workout_equipment = request.form.get('cardio-workout-equipment')
+        workout_distance = request.form.get('cardio-distance')
+        workout_duration = request.form.get('cardio-duration')
+        cardio_type = request.form.get('cardio-workout-type')
+        workout_description = request.form.get('cardio-workout-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Workouts(Intensity, WorkoutDescription, Equipment, WorkoutName) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (workout_intensity, workout_description, workout_equipment, workout_name))
+        cur.execute("INSERT INTO Cardio(WorkoutID, Distance, Duration, CardioType) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (cur.lastrowid, workout_distance, workout_duration, cardio_type))
         mysql.connection.commit()
         cur.close()
 

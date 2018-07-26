@@ -6,9 +6,13 @@
     <div class="container">
         <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
             <div class="container">
-                <button type="button" class="btn btn-success float-right" data-toggle="modal"
-                        data-target="#workoutForm">
-                    <i class="fas fa-plus"></i>&nbsp;Add Workout
+                <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal"
+                        data-target="#strengthWorkoutForm">
+                    <i class="fas fa-plus"></i>&nbsp;Add Strength
+                </button>
+                <button type="button" class="btn btn-sm btn-success float-right mr-3" data-toggle="modal"
+                        data-target="#cardioWorkoutForm">
+                    <i class="fas fa-plus"></i>&nbsp;Add Cardio
                 </button>
                 <nav class="nav">
                     <a class="px-2 nav-link" href="/trainers_search"><h1> Trainers </h1></a>
@@ -25,7 +29,7 @@
                                     <input class="form-control" type="text" name="WorkoutName" pattern="[^'\x22]+"
                                            placeholder="Search Workouts by Name" aria-label="Search"
                                            value={{ request.form.WorkoutName }}>
-                                    <button type="submit" class="btn btn-primary">Search</button>
+                                    <button type="submit" class="btn btn-primary mt-3">Search</button>
                                 </form>
                             </div>
                         </form>
@@ -67,29 +71,76 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="workoutForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    <!-- Strength Modal -->
+    <div class="modal fade" id="strengthWorkoutForm" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form method="post" action="/add_workout">
+                <form method="post" action="/add_strength_workout">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">New Workout</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">New Strength Workout</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <label for="workout-name" class="col-form-label">Workout Name:</label>
-                        <input type="text" class="form-control" name="workout-name" id="workout-name" required>
+                        <input type="text" class="form-control" name="strength-workout-name" id="workout-name" required>
                         <label for="workout-intensity" class="col-form-label">Workout Intensity:</label>
-                        <input type="text" class="form-control" name="workout-intensity" id="workout-intensity"
+                        <input type="text" class="form-control" name="strength-workout-intensity" id="workout-intensity"
                                required>
                         <label for="workout-equipment" class="col-form-label">Workout Equipment:</label>
-                        <input type="text" class="form-control" name="workout-equipment" id="workout-equipment"
+                        <input type="text" class="form-control" name="strength-workout-equipment" id="workout-equipment"
+                               required>
+                        <label for="body-part" class="col-form-label">Body Part:</label>
+                        <input type="text" class="form-control" name="strength-body-part" id="body-part"
+                               required>
+                        <label for="strength-type" class="col-form-label">Strength Type:</label>
+                        <input type="text" class="form-control" name="strength-type" id="strength-type">
+                        <label for="workout-description" class="col-form-label">Workout Description:</label>
+                        <textarea class="form-control" name="strength-workout-description" id="workout-description"
+                                  required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strength Modal -->
+    <div class="modal fade" id="cardioWorkoutForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form method="post" action="/add_cardio_workout">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">New Cardio Workout</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="workout-name" class="col-form-label">Workout Name:</label>
+                        <input type="text" class="form-control" name="cardio-workout-name" id="workout-name" required>
+                        <label for="workout-intensity" class="col-form-label">Workout Intensity:</label>
+                        <input type="text" class="form-control" name="cardio-workout-intensity" id="workout-intensity"
+                               required>
+                        <label for="workout-equipment" class="col-form-label">Workout Equipment:</label>
+                        <input type="text" class="form-control" name="cardio-workout-equipment" id="workout-equipment"
+                               required>
+                        <label for="distance" class="col-form-label">Distance:</label>
+                        <input type="text" class="form-control" name="cardio-distance" id="distance">
+                        <label for="duration" class="col-form-label">Duration:</label>
+                        <input type="text" class="form-control" name="cardio-duration" id="duration">
+                        <label for="cardio-type" class="col-form-label">Cardio Type:</label>
+                        <input type="text" class="form-control" name="cardio-workout-type" id="cardio-type"
                                required>
                         <label for="workout-description" class="col-form-label">Workout Description:</label>
-                        <textarea class="form-control" name="workout-description" id="workout-description"
+                        <textarea class="form-control" name="strength-workout-description" id="workout-description"
                                   required></textarea>
                     </div>
                     <div class="modal-footer">

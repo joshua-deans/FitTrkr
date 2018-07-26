@@ -6,7 +6,8 @@
     <div class="container">
         <div class="jumbotron jumbotron-fluid mx-auto px-3 py-5">
             <div class="container">
-                <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#mealForm">
+                <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal"
+                        data-target="#mealForm">
                     <i class="fas fa-plus"></i>&nbsp;Add Meal
                 </button>
                 <nav class="nav">
@@ -24,7 +25,7 @@
                                     <input class="form-control" type="text" name="MealName" pattern="[^'\x22]+"
                                            placeholder="Search Meals by Name" aria-label="Search"
                                            value={{ request.form.MealName }}>
-                                    <button type="submit" class="btn btn-primary">Search</button>
+                                    <button type="submit" class="btn btn-primary mt-3">Search</button>
                                 </form>
                             </div>
                         </form>
