@@ -304,16 +304,7 @@ VALUES
     ('bm','Bill','Murray','323b80f823690d94','Male',69,'15010 NE 36 St','98052');
 
 ```
-```
-INSERT INTO Clients
-VALUES
-    (1,1.7,68,'Muscle','Low',1),
-    (2,1.8,70,'Endurance','High',2),
-    (3,1.65,65,'Muscle','Low',3),
-    (4,1.75,75,'Muscle','Low',4),
-    (5,1.85,85,'Weight loss','Medium',5);
 
-```
 ```
 INSERT INTO Meals
 VALUES
@@ -379,11 +370,21 @@ VALUES
 
 ```
 ```
+INSERT INTO Clients
+VALUES
+    (1,1.7,68,'Muscle','Low',1),
+    (2,1.8,70,'Endurance','High',2),
+    (3,1.65,65,'Muscle','Low',3),
+    (4,1.75,75,'Muscle','Low',4),
+    (5,1.85,85,'Weight loss','Medium',5);
+
+```
+```
 INSERT INTO MealPlan_Meal
 VALUES
     (1,'Green is Clean',3,'lunch/dinner' ),
     (1,'Green is great',5,'breakfast'),
-    (2,'Delishhh!'3, 'lunch/dinner'),
+    (2,'Delishhh!',3, 'lunch/dinner'),
     (2,'Yummmmmm',1,'lunch/dinner'),
     (2,'Yum in your tum!',4,'lunch/dinner');
 
