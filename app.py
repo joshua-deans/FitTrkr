@@ -67,6 +67,14 @@ def base():
     return render_template('base.html')
 
 
+
+# Route for about page
+@app.route("/about/")
+def about():
+    return render_template('about.html')
+
+
+
 class SignupForm(Form):
     username = StringField('Username', [
         validators.DataRequired(),
