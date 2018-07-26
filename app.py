@@ -93,6 +93,15 @@ def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
+        #Checks to see if username already exists
+        cur = mysql.connect.cursor()
+        username_check = cur.execute(
+           'SELECT * from users WHERE UserName = %s', [username,]
+        )
+        cur.close()
+        if username_check > 0:
+           flash('Username is already taken, try a different one', 'danger')
+           return render_template('auth/signup.html', form=form)
         salt = urandom(16)
         password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
         b64_salt = base64.b64encode(salt)
