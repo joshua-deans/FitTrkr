@@ -241,8 +241,8 @@ CREATE TABLE Clients
 ```
 CREATE TABLE Logs
 	(
-	UserID INT(11) AUTO_INCREMENT,
-	LogID INT(11),
+	UserID INT(11) NOT NULL,
+	LogID INT(11) AUTO_INCREMENT,
 	FitnessProgramID INT NOT NULL,
 	LogDate DATE,
 	Weight DOUBLE,
@@ -250,7 +250,7 @@ CREATE TABLE Logs
 	Notes VARCHAR(1000),
 	SatisfactionLevel INT(11),
 	MealCompletion INT(11),
-	Primary Key(UserID, logID),
+	Primary Key(LogID),
 	Foreign Key(UserID) references Users(UserID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
