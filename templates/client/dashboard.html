@@ -2,11 +2,7 @@
 
 <!-TODO: Replace client with User name ->
 {% block title %}
-    {% if user.FirstName != None and user.LastName != None %}
-        {{ user.FirstName }} {{ user.LastName }} - Dashboard
-    {% else %}
-        {{ user.UserName }} - Dashboard
-    {% endif %}
+    Dashboard
 {% endblock %}
 
 {% block head %}
@@ -63,12 +59,6 @@
                 {% if fitness_program %}
                     <p class="lead">Your current fitness program is: <b>{{ fitness_program['FitnessProgramName'] }}</b>
                     </p>
-                    <p>And meal plan: <i>{{ fitness_program['MealPlanName'] }}</i></p>
-                    {% if fitness_program['FirstName'] != None and fitness_program['LastName'] != None %}
-                        <p>Trained by: <i>{{ fitness_program['FirstName'] }} {{ fitness_program['LastName'] }}</i></p>
-                    {% else %}
-                        <p>Trained by: <i>{{ fitness_program['UserName'] }}</i></p>
-                    {% endif %}
                 {% else %}
                     <p class="lead">You are not currently enrolled in a fitness program</p>
                 {% endif %}

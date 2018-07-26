@@ -324,10 +324,15 @@ def client_browse_plans(user_id, plan_info=None):
         'f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
+    cur.execute(
+        'SELECT c.Current_FitnessProgram '
+        'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', str(user_id))
+    curr_fitness_program = cur.fetchone()
     if result:
         plan_info = result
     cur.close()
-    return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
+    return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
+                           curr_fitness_program=curr_fitness_program)
 
 
 @app.route("/client/<int:user_id>/logs/")
@@ -335,9 +340,9 @@ def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
     cur.execute(
-        'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
+        'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
         'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
+        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s ', str(user_id))
     result = cur.fetchall()
     print(result)
     if result:

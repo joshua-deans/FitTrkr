@@ -57,7 +57,7 @@
                     <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Fitness Program ID</th>
+                        <th scope="col">Fitness Program</th>
                         <th scope="col">Date</th>
                         <th scope="col">Weight</th>
                         <th scope="col">Workout Completion</th>
@@ -70,7 +70,7 @@
                     {% for item in log_info %}
                         <tr>
                             <th scope="row">{{ item['LogID'] }}</th>
-                            <td>{{ item['FitnessProgramID'] }}</td>
+                            <td>{{ item['FitnessProgramName'] }}</td>
                             <td>{{ item['LogDate'] }}</td>
                             <td>{{ item['Weight'] }}</td>
                             <td>{{ item['WorkoutCompletion'] }}</td>
