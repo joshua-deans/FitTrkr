@@ -192,10 +192,14 @@ CREATE TABLE Clients
 	Weight DOUBLE,
 	PrimaryGoals VARCHAR(300),
 	FitnessLevel VARCHAR(140),
+	Current_FitnessProgram INT(11),
 	Primary Key(UserID),
 	Foreign Key(UserID) references Users(UserID)
 		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON UPDATE CASCADE,
+	Foreign Key(Current_FitnessProgram) references FitnessProgram(FitnessProgramID)
+	    ON DELETE CASCADE
+	    ON UPDATE CASCADE
 	);
 ```
 
@@ -304,11 +308,11 @@ VALUES
 ```
 INSERT INTO Clients
 VALUES
-    (1,1.7,68,'Muscle','Low'),
-    (2,1.8,70,'Endurance','High'),
-    (3,1.65,65,'Muscle','Low'),
-    (4,1.75,75,'Muscle','Low'),
-    (5,1.85,85,'Weight loss','Medium');
+    (1,1.7,68,'Muscle','Low',1),
+    (2,1.8,70,'Endurance','High',2),
+    (3,1.65,65,'Muscle','Low',3),
+    (4,1.75,75,'Muscle','Low',4),
+    (5,1.85,85,'Weight loss','Medium',5);
 
 ```
 ```
