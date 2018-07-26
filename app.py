@@ -67,6 +67,14 @@ def base():
     return render_template('base.html')
 
 
+
+# Route for about page
+@app.route("/about/")
+def about():
+    return render_template('about.html')
+
+
+
 class SignupForm(Form):
     username = StringField('Username', [
         validators.DataRequired(),
@@ -432,11 +440,6 @@ def trainers_search():
 @app.route("/trainer_search/<string:UserID>/")
 def trainer_search(UserID):
     cur = mysql.connection.cursor()
-    # userid = str(UserID)
-    # userid4 = "13"
-    # #print(userid4)
-    # result = cur.execute('SELECT t.UserID, UserName, FirstName, LastName, TrainerFocus t.trainerFoc FROM trainers t, users u'
-    #                     'WHERE t.UserID = u.UserID AND t.UserID = %s', str(UserID) )
     print(UserID)
     result = cur.execute('SELECT *'
                         'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s', (UserID,UserID) )
