@@ -95,7 +95,7 @@ def signup():
         #Checks to see if username already exists
         cur = mysql.connect.cursor()
         username_check = cur.execute(
-           'SELECT * from users WHERE UserName = %s', [username,]
+            'SELECT * from Users WHERE UserName = %s', [username, ]
         )
         cur.close()
         if username_check > 0:
