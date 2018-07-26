@@ -187,7 +187,7 @@ CREATE TABLE Session
 ```
 CREATE TABLE Clients
 (
-	UserID INT(11) AUTO_INCREMENT,
+	UserID INT(11),
 	Height DOUBLE,
 	Weight DOUBLE,
 	PrimaryGoals VARCHAR(300),
