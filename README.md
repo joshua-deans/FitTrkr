@@ -223,7 +223,7 @@ CREATE TABLE FitnessProgram
 	WorkoutPlanID INT NOT NULL,
 	MealPlanID INT NOT NULL,
 	Primary Key (FitnessProgramID),
-	Foreign Key (TrainerID) references Trainer(UserID)
+	Foreign Key (TrainerID) references Users(UserID)
 		ON DELETE SET NULL
 		ON UPDATE CASCADE,
 	Foreign Key(WorkoutPlanID) references WorkoutPlan(WorkoutPlanID)
