@@ -1,5 +1,4 @@
 import base64
-from datetime import datetime
 from os import urandom
 
 import scrypt
@@ -297,10 +296,21 @@ def client(user_id):
     cur.execute(
         'SELECT * '
         'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', str(user_id))
-    result = cur.fetchone()
+    user_result = cur.fetchone()
     cur.close()
-    if result:
-        return render_template('client/dashboard.html', user=result, request=request, user_id=user_id)
+    if user_result:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT f.FitnessProgramName, u1.UserName, u1.FirstName, u1.LastName, w.WorkoutPlanName, m.MealPlanName '
+            'FROM Users u, FitnessProgram f, Clients c, Users u1, MealPlan m, WorkoutPlan w '
+            'WHERE u.UserID = %s AND u.UserID = c.UserID AND c.Current_FitnessProgram = f.FitnessProgramID AND '
+            'f.TrainerID = u1.UserID AND f.WorkoutPlanID = w.WorkoutPlanID AND f.MealPlanID = m.MealPlanID'
+            , str(user_id))
+        program_result = cur.fetchone()
+        print(program_result)
+        cur.close()
+        return render_template('client/dashboard.html', user=user_result, fitness_program=program_result,
+                               request=request, user_id=user_id)
     else:
         return redirect('/')
 

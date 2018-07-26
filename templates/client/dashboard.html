@@ -60,32 +60,37 @@
                 {% else %}
                     <h2 class="display-5">{{ user.UserName }}</h2>
                 {% endif %}
-                <p class="lead">Your current fitness program is: <b>Starting Strength</b></p>
-                <p>With workout plan: <i>Starting Strength</i></p>
-                <p>And meal plan: <i>Starting Strength</i></p>
-                <p>Trained by: <i>Trainer Name</i></p>
+                {% if fitness_program %}
+                    <p class="lead">Your current fitness program is: <b>{{ fitness_program['FitnessProgramName'] }}</b>
+                    </p>
+                    <p>And meal plan: <i>{{ fitness_program['MealPlanName'] }}</i></p>
+                    {% if fitness_program['FirstName'] != None and fitness_program['LastName'] != None %}
+                        <p>Trained by: <i>{{ fitness_program['FirstName'] }} {{ fitness_program['LastName'] }}</i></p>
+                    {% else %}
+                        <p>Trained by: <i>{{ fitness_program['UserName'] }}</i></p>
+                    {% endif %}
+                {% else %}
+                    <p class="lead">You are not currently enrolled in a fitness program</p>
+                {% endif %}
             </div>
         </div>
         <br>
+        {% if fitness_program %}
         <div class="row">
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Today's Meal Plan</b></div>
+                    <div class="card-header"><b>Meal Plan</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Broccoli</li>
-                        <li class="list-group-item">Pizza</li>
-                        <li class="list-group-item">Salad</li>
+                        <li class="list-group-item">{{ fitness_program['MealPlanName'] }}</li>
                     </ul>
                 </div>
                 <br>
             </div>
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Today's Exercise</b></div>
+                    <div class="card-header"><b>Workout Plan</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Deadlifts</li>
-                        <li class="list-group-item">Squats</li>
-                        <li class="list-group-item">Bench</li>
+                        <li class="list-group-item">{{ fitness_program['WorkoutPlanName'] }}</li>
                     </ul>
                 </div>
                 <br>
@@ -93,15 +98,18 @@
             <br>
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Recent Logs</b></div>
+                    <div class="card-header"><b>Trainer</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Log 44</li>
-                        <li class="list-group-item">Log 43</li>
-                        <li class="list-group-item">Log 42</li>
+                        {% if fitness_program['FirstName'] != None and fitness_program['LastName'] != None %}
+                            <li class="list-group-item">{{ fitness_program['FirstName'] }} {{ fitness_program['LastName'] }}</li>
+                        {% else %}
+                            <li class="list-group-item">{{ fitness_program['UserName'] }}</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <br>
             </div>
         </div>
+        {% endif %}
     </div>
 {% endblock %}
