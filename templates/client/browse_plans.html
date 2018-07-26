@@ -56,6 +56,7 @@
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">ID</th>
+                    <th scope="col">Plan Name</th>
                     <th scope="col">Plan Description</th>
                     <th scope="col">Trainer Name</th>
                     <th scope="col">Intensity</th>
@@ -69,14 +70,20 @@
                 <tr>
                     {% if item['FitnessProgramID'] == curr_fitness_program['Current_FitnessProgram'] %}
                         <th scope="row">
-                            <button class="btn btn-primary btn-sm disabled">Join</button>
+                            <form method="POST" action="/client/{{ user_id }}/change_program/NULL">
+                                <button type="submit" class="btn btn-danger btn-sm">Leave</button>
+                            </form>
                         </th>
                     {% else %}
                         <th scope="row">
-                            <button class="btn btn-primary btn-sm">Join</button>
+                            <form method="POST"
+                                  action="/client/{{ user_id }}/change_program/{{ item['FitnessProgramID'] }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Join</button>
+                            </form>
                         </th>
                     {% endif %}
                     <th scope="row">{{ item['FitnessProgramID'] }}</th>
+                    <td>{{ item['FitnessProgramName'] }}</td>
                     <td>{{ item['Description'] }}</td>
                     <td>{{ item['FirstName'] + " " + item['LastName'] }}</td>
                     <td>{{ item['FP_intensity'] }}</td>

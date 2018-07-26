@@ -320,8 +320,8 @@ def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
     cur.execute(
-        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
-        'f.MealPlanID, f.WorkoutPlanID '
+        'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
+        'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
     cur.execute(
@@ -333,6 +333,24 @@ def client_browse_plans(user_id, plan_info=None):
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
                            curr_fitness_program=curr_fitness_program)
+
+
+@app.route("/client/<int:user_id>/change_program/<program_id>", methods=['POST'])
+def client_change_plan(user_id, program_id):
+    cur = mysql.connection.cursor()
+    if program_id == "NULL":
+        cur.execute(
+            'UPDATE Clients c '
+            'SET c.Current_FitnessProgram = NULL '
+            'WHERE c.UserID = %s', (user_id,))
+    else:
+        cur.execute(
+            'UPDATE Clients c '
+            'SET c.Current_FitnessProgram = %s '
+            'WHERE c.UserID = %s', (program_id, user_id))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('client_browse_plans', user_id=user_id))
 
 
 @app.route("/client/<int:user_id>/logs/")
