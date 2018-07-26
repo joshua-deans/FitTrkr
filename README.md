@@ -241,8 +241,8 @@ CREATE TABLE Clients
 ```
 CREATE TABLE Logs
 	(
-	UserID INT(11) AUTO_INCREMENT,
-	LogID INT(11),
+	UserID INT(11),
+	LogID INT(11) AUTO_INCREMENT,
 	FitnessProgramID INT NOT NULL,
 	LogDate DATE,
 	Weight DOUBLE,
