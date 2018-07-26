@@ -110,6 +110,7 @@ CREATE TABLE Strength
 CREATE TABLE MealPlan_Meal
 	(
 	MealPlanID INT(11) AUTO_INCREMENT,
+	MealPlanName VARCHAR(50),
 	MealID INT(11),
 	MealTime CHAR(50),
 	Primary Key(MealplanID, MealID),
@@ -126,6 +127,7 @@ CREATE TABLE MealPlan_Meal
 CREATE TABLE Workout_Comprise_WPlan
 	(
 	WorkoutPlanID INT(11),
+	WorkoutPlanName VARCHAR(50),
 	WorkOutID INT(11),
 	NumSets INT(11),
 	NumReps INT(11),
@@ -185,7 +187,7 @@ CREATE TABLE Session
 ```
 CREATE TABLE Clients
 (
-	UserID INT(11) AUTO_INCREMENT,
+	UserID INT(11),
 	Height DOUBLE,
 	Weight DOUBLE,
 	PrimaryGoals VARCHAR(300),
@@ -200,7 +202,7 @@ CREATE TABLE Clients
 ```
 CREATE TABLE Trainers
 (
-	UserID INT(11) AUTO_INCREMENT,
+	UserID INT(11),
 	TrainerFocus VARCHAR(300),
 	Primary Key (UserID),
 	Foreign Key(UserID) references Users(UserID)
@@ -213,7 +215,7 @@ CREATE TABLE Trainers
 CREATE TABLE FitnessProgram
 	(
 	FitnessProgramID INT(11) AUTO_INCREMENT,
-	FitnessProgramName VARCHAR(30);
+	FitnessProgramName VARCHAR(30),
 	FP_intensity VARCHAR(50),
 	Description VARCHAR(400),
 	Program_Length VARCHAR(20),
