@@ -381,11 +381,11 @@ VALUES
 ```
 INSERT INTO MealPlan_Meal
 VALUES
-    (1,3,'lunch/dinner' ),
-    (1,5,'breakfast'),
-    (2,3, 'lunch/dinner'),
-    (2,1,'lunch/dinner'),
-    (2,4,'lunch/dinner');
+    (1,'Green is Clean',3,'lunch/dinner' ),
+    (1,'Green is great',5,'breakfast'),
+    (2,'Delishhh!'3, 'lunch/dinner'),
+    (2,'Yummmmmm',1,'lunch/dinner'),
+    (2,'Yum in your tum!',4,'lunch/dinner');
 
 ```
 
