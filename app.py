@@ -259,9 +259,9 @@ def trainer_workout_plans(user_id):
 @app.route("/workouts", methods=['GET', 'POST'])
 def workouts():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         WorkoutName = request.form['WorkoutName']
-        WorkoutNamePassed = '%' + WorkoutName + '%' 
+        WorkoutNamePassed = '%' + WorkoutName + '%'
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Workouts WHERE WorkoutName LIKE %s ", [WorkoutNamePassed])
         Workouts = cur.fetchall()
@@ -273,7 +273,7 @@ def workouts():
             return render_template('workouts.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Workouts")
         Workouts = cur.fetchall()
@@ -327,9 +327,9 @@ def workout(workoutID):
 @app.route("/meals/", methods=['GET', 'POST'])
 def meals():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         MealName = request.form['MealName']
-        MealNamePassed = '%' + MealName + '%' 
+        MealNamePassed = '%' + MealName + '%'
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
         Meals = cur.fetchall()
@@ -341,7 +341,7 @@ def meals():
             return render_template('meals.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Meals")
         Meals = cur.fetchall()
@@ -349,7 +349,7 @@ def meals():
         if result > 0:
             return render_template('meals.html', meals=Meals)
         else:
-            msg = "No workouts Found"
+            msg = "No meals Found"
             return render_template('meals.html', msg=msg)
         cur.close()
 
@@ -380,13 +380,13 @@ def add_meal():
 @app.route("/meal/<string:mealID>/")
 def meal(mealID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID))
+    result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID,))
     Meal = cur.fetchone()
 
     if result > 0:
         return render_template('meal.html', meal=Meal)
     else:
-        msg = "No workouts Found"
+        msg = "No meals Found"
         return render_template('meals.html', msg=msg)
     cur.close()
 
@@ -397,21 +397,22 @@ def meal(mealID):
 @app.route("/trainers_search", methods=['GET', 'POST'])
 def trainers_search():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         TrainerUserName = request.form['UserName']
-        TrainerUserNamePassed = '%' + TrainerUserName + '%' 
+        TrainerUserNamePassed = '%' + TrainerUserName + '%'
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s " , [TrainerUserNamePassed] )
+        result = cur.execute("SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s ",
+                             [TrainerUserNamePassed])
         Trainers = cur.fetchall()
 
         if result > 0:
             return render_template('trainers.html', trainers=Trainers)
         else:
-            msg = "No meals Found"
+            msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute(
             'SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID')
@@ -420,7 +421,7 @@ def trainers_search():
         if result > 0:
             return render_template('trainers.html', trainers=Trainers)
         else:
-            msg = "No workouts Found"
+            msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
         cur.close()
 
@@ -438,13 +439,14 @@ def trainer_search(UserID):
     #                     'WHERE t.UserID = u.UserID AND t.UserID = %s', str(UserID) )
     print(UserID)
     result = cur.execute('SELECT *'
-                        'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s', (UserID,UserID) )
+                         'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s',
+                         (UserID, UserID))
     Trainer = cur.fetchone()
 
     if result > 0:
         return render_template('trainer.html', trainer=Trainer)
     else:
-        msg = "No workouts Found"
+        msg = "No trainers Found"
         return render_template('trainers.html', msg=msg)
     cur.close()
 
