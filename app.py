@@ -274,7 +274,7 @@ def trainer_meal_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
-    print(result);
+    print(result)
     if result:
         plan_info = result
     cur.close()
@@ -432,11 +432,6 @@ def trainers_search():
 @app.route("/trainer_search/<string:UserID>/")
 def trainer_search(UserID):
     cur = mysql.connection.cursor()
-    # userid = str(UserID)
-    # userid4 = "13"
-    # #print(userid4)
-    # result = cur.execute('SELECT t.UserID, UserName, FirstName, LastName, TrainerFocus t.trainerFoc FROM trainers t, users u'
-    #                     'WHERE t.UserID = u.UserID AND t.UserID = %s', str(UserID) )
     print(UserID)
     result = cur.execute('SELECT *'
                         'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s', (UserID,UserID) )
