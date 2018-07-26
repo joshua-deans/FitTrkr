@@ -7,41 +7,68 @@
 {% endblock %}
 
 {% block nav_items %}
-    <li class="nav-item">
-        <a class="nav-link" href="/login">Dashboard</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/login">Program</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/login">Meal Plans</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/login">Workout Plans</a>
-    </li>
+    {% if is_logged_in_bool(request) %}
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Program</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Meal Plans</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Workout Plans</a>
+        </li>
+        <!-- <li class="nav-item">Logged in!</li> -->
+    {% else %}
+        <!-- <li class="nav-item">Logged out!</li> -->
+        <li class="nav-item">
+            <a class="nav-link" href="/about">About Us</a>
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block nav_items_right %}
-
-<li class="nav-item">
-    <a class="nav-link" href="/login">Login</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/signup">Signup</a>
-</li>
-
-    <li class="nav-item dropdown">
-        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <!-- Search all meals by Workout name, meal name, trainer
-            As you click each you see all the pages, then on the page
-            itself there is a search box that would run the query-->
-            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
-            <li><a class="dropdown-item" href="/meals">Meals</a></li>
-            <li><a class="dropdown-item" href="/trainers_search">Trainers</a></li>
-        </ul>
-    </li>
+    {% if is_logged_in_bool(request) %}
+        <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/settings">Settings</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- Search all meals by Workout name, meal name, trainer
+                As you click each you see all the pages, then on the page
+                itself there is a search box that would run the query-->
+                <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+                <li><a class="dropdown-item" href="/meals">Meals</a></li>
+                <li><a class="dropdown-item" href="/trainers_search">Trainers</a></li>
+            </ul>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/signup">Signup</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- Search all meals by Workout name, meal name, trainer
+                As you click each you see all the pages, then on the page
+                itself there is a search box that would run the query-->
+                <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+                <li><a class="dropdown-item" href="/meals">Meals</a></li>
+                <li><a class="dropdown-item" href="/trainers_search">Trainers</a></li>
+            </ul>
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block body %}

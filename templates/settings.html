@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/auth_style.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card auth-form mx-auto">
+            <div class="card-header">
+                <h2>Profile</h2>
+            </div>
+            <div class="card-body">
+                {% from "includes/_formhelpers.html" import render_field %}
+                <form action="" method="post">
+                    <div class="form-group">
+                        {{render_field(form.first_name, class_="form-control", value=first_name)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.last_name, class_="form-control", value=last_name)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.gender, class_="form-control", value=gender)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.age, class_="form-control", value=age)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.address, class_="form-control", value=address)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.postal_code, class_="form-control", value=postal_code)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.city, class_="form-control", value=city)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.province_state, class_="form-control", value=province_state)}}
+                    </div>
+                    <div class="form-group">
+                        {{render_field(form.country, class_="form-control", value=country)}}
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

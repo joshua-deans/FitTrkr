@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 from os import urandom
 
 import scrypt
@@ -36,6 +37,20 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
             return True, result['UserID']
     return False, -1
 
+def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
+    cookies = flask_request.cookies
+    if 'token' in cookies:
+        token = cookies.get('token')
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT UserID FROM Session WHERE Token = %s',
+            (token,))
+        result = cur.fetchone()
+        if 'UserID' in result:
+            return True
+    return False
+
+app.jinja_env.globals.update(is_logged_in_bool=is_logged_in_bool)
 
 def verify_proper_user(logged_in_as, user_id):
     if not logged_in_as[0]:
@@ -49,8 +64,15 @@ def verify_proper_user(logged_in_as, user_id):
 # Route for landing page
 @app.route("/")
 def base():
-    logged_in_as = is_logged_in(request)
     return render_template('base.html')
+
+
+
+# Route for about page
+@app.route("/about/")
+def about():
+    return render_template('about.html')
+
 
 
 class SignupForm(Form):
@@ -85,6 +107,119 @@ def signup():
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
 
+class SettingsForm(Form):
+    first_name = StringField('First name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    last_name = StringField('Last name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    gender = StringField('Gender', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=10)
+    ])
+    age = StringField('Age', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=11)
+    ])
+    address = StringField('Address', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+    postal_code = StringField('Postal code', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=6)
+    ])
+    city = StringField('City', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+    province_state = StringField('Province or State', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    country = StringField('Country', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+
+@app.route("/settings/", methods=['GET', 'POST'])
+def settings():
+    form = SettingsForm(request.form)
+    if is_logged_in_bool(request):
+        user_id = is_logged_in(request)[1]
+        if request.method == 'POST' and form.validate():
+            cur = mysql.connection.cursor()
+            cur.execute(
+                'REPLACE INTO PostalCode(PostalCode, City, ProvinceState, Country) '
+                'VALUES (%s, %s, %s, %s)',
+                (form.postal_code.data,
+                 form.city.data,
+                 form.province_state.data,
+                 form.country.data)
+            )
+            mysql.connection.commit()
+            cur.execute(
+                'UPDATE Users '
+                'SET FirstName = %s, '
+                'LastName = %s, '
+                'Gender = %s, '
+                'Age = %s, '
+                'Address = %s, '
+                'PostalCode = %s '
+                'WHERE UserID = %s',
+                (form.first_name.data,
+                form.last_name.data,
+                form.gender.data,
+                form.age.data,
+                form.address.data,
+                form.postal_code.data,
+                user_id)
+            )
+            mysql.connection.commit()
+            cur.close()
+            return redirect(url_for('settings'))
+        else:
+            cur = mysql.connection.cursor()
+            cur.execute(
+                'SELECT * '
+                'FROM Users '
+                'WHERE UserID = %s',
+                (user_id,)
+            )
+            res = cur.fetchone()
+            city = None
+            province_state = None
+            country = None
+            if 'PostalCode' in res:
+                if cur.execute(
+                    'SELECT City, ProvinceState, Country '
+                    'FROM PostalCode '
+                    'WHERE PostalCode = %s',
+                    (res['PostalCode'],)
+                ) > 0:
+                    res_postal = cur.fetchone()
+                    city = res_postal['City']
+                    province_state = res_postal['ProvinceState']
+                    country = res_postal['Country']
+            cur.close()
+            return render_template(
+                'settings.html',
+                form=form,
+                first_name=res['FirstName'],
+                last_name=res['LastName'],
+                gender=res['Gender'],
+                age=res['Age'],
+                address=res['Address'],
+                postal_code=res['PostalCode'],
+                city=city,
+                province_state=province_state,
+                country=country
+            )
+    else:
+        return redirect(url_for('base'))
 
 class LoginForm(Form):
     username = StringField('Username', [
@@ -101,33 +236,57 @@ def login():
     if request.method == 'POST' and form.validate():
         username = form.username.data
         cur = mysql.connection.cursor()
-        cur.execute(
+        user_check = cur.execute(
             'SELECT UserID, PasswordHash, PasswordSalt FROM Users WHERE UserName = %s',
             (username,))
         result = cur.fetchone()
-        db_hash = base64.b64decode(result['PasswordHash'])
-        salt = base64.b64decode(result['PasswordSalt'])
-        password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
-        if password_hash == db_hash:
-            token = base64.b64encode(urandom(64))
-            user_id = result['UserID']
-            cur.execute(
-                'INSERT INTO Session(UserID, Token) VALUES (%s, %s)',
-                (user_id, token))
-            mysql.connection.commit()
-            cur.close()
-            resp = redirect(url_for('base'))
-            resp.set_cookie(
-                'token',
-                token,
-                86400,
-                domain='127.0.0.1',
-                # secure=True,
-                httponly=True)
-            flash('You are now logged in', 'success')
-            return resp
+        if user_check >0:
+            db_hash = base64.b64decode(result['PasswordHash'])
+            salt = base64.b64decode(result['PasswordSalt'])
+            password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
+            if password_hash == db_hash:
+                app.logger.info('PASSWORD MATCHED')
+                token = base64.b64encode(urandom(64))
+                user_id = result['UserID']
+                cur.execute(
+                    'INSERT INTO Session(UserID, Token) VALUES (%s, %s)',
+                    (user_id, token))
+                mysql.connection.commit()
+                cur.close()
+                resp = redirect(url_for('base'))
+                resp.set_cookie(
+                    'token',
+                    token,
+                    86400,
+                    domain='127.0.0.1',
+                    # secure=True,
+                    httponly=True)
+                flash('You are now logged in', 'success')
+                return resp
+            else:
+                flash('Invalid Password, Try again', 'danger')
+                app.logger.info('PASSWORD NOT MATCHED')
+        else:
+            flash('Invalid Username, Try again', 'danger')
+            app.logger.info('NO USER')
     return render_template('auth/login.html', form=form)
 
+@app.route("/logout/")
+def logout():
+    resp = redirect(url_for('base'))
+    if is_logged_in(request)[0]:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'DELETE FROM Session WHERE Token = %s',
+            (request.cookies.get('token'),))
+        mysql.connection.commit()
+        cur.close()
+        resp.set_cookie(
+            'token',
+            '',
+            expires='Thu, 01 Jan 1970 00:00:00 GMT'
+        )
+    return resp
 
 # CLIENT ROUTES
 
@@ -233,7 +392,7 @@ def trainer_meal_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
-    print(result);
+    print(result)
     if result:
         plan_info = result
     cur.close()
@@ -432,11 +591,6 @@ def trainers_search():
 @app.route("/trainer_search/<string:UserID>/")
 def trainer_search(UserID):
     cur = mysql.connection.cursor()
-    # userid = str(UserID)
-    # userid4 = "13"
-    # #print(userid4)
-    # result = cur.execute('SELECT t.UserID, UserName, FirstName, LastName, TrainerFocus t.trainerFoc FROM trainers t, users u'
-    #                     'WHERE t.UserID = u.UserID AND t.UserID = %s', str(UserID) )
     print(UserID)
     result = cur.execute('SELECT *'
                          'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s',
