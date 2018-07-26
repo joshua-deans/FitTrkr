@@ -1,11 +1,7 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-<<<<<<< HEAD
     <div class="alert alert-{{ category }}">{{ message }} </div>
-=======
-      <div class="alert alert-{{ category }}">{{ message }}</div>
->>>>>>> 4436289426ef16c3137f7973da567f84f7ef3c8a
     {% endfor %}
   {% endif %}
 {% endwith %}
