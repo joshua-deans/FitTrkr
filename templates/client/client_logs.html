@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 <!-TODO: Replace client with User name ->
-{% block title %}Client - Dashboard{% endblock %}
+{% block title %}Logs{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
@@ -47,7 +47,7 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1 class="display-5" style="display: inline">Fitness Plans</h1>
+        <h1 class="display-5" style="display: inline">Logs</h1>
         <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal"
                 data-target="#logForm">
             <i class="fas fa-plus"></i>&nbsp;New Log
@@ -128,4 +128,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        document.getElementById('log-date').valueAsDate = new Date();
+    </script>
 {% endblock %}
