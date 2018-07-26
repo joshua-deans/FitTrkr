@@ -99,9 +99,119 @@ def signup():
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
 
+class SettingsForm(Form):
+    first_name = StringField('First name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    last_name = StringField('Last name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    gender = StringField('Gender', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=10)
+    ])
+    age = StringField('Age', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=11)
+    ])
+    address = StringField('Address', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+    postal_code = StringField('Postal code', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=6)
+    ])
+    city = StringField('City', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+    province_state = StringField('Province or State', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)
+    ])
+    country = StringField('Country', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)
+    ])
+
 @app.route("/settings/", methods=['GET', 'POST'])
 def settings():
-    return redirect(url_for('base'))
+    form = SettingsForm(request.form)
+    if is_logged_in_bool(request):
+        user_id = is_logged_in(request)[1]
+        if request.method == 'POST' and form.validate():
+            cur = mysql.connection.cursor()
+            cur.execute(
+                'REPLACE INTO PostalCode(PostalCode, City, ProvinceState, Country) '
+                'VALUES (%s, %s, %s, %s)',
+                (form.postal_code.data,
+                 form.city.data,
+                 form.province_state.data,
+                 form.country.data)
+            )
+            mysql.connection.commit()
+            cur.execute(
+                'UPDATE Users '
+                'SET FirstName = %s, '
+                'LastName = %s, '
+                'Gender = %s, '
+                'Age = %s, '
+                'Address = %s, '
+                'PostalCode = %s '
+                'WHERE UserID = %s',
+                (form.first_name.data,
+                form.last_name.data,
+                form.gender.data,
+                form.age.data,
+                form.address.data,
+                form.postal_code.data,
+                user_id)
+            )
+            mysql.connection.commit()
+            cur.close()
+            return redirect(url_for('settings'))
+        else:
+            cur = mysql.connection.cursor()
+            cur.execute(
+                'SELECT * '
+                'FROM Users '
+                'WHERE UserID = %s',
+                (user_id,)
+            )
+            res = cur.fetchone()
+            city = None
+            province_state = None
+            country = None
+            if 'PostalCode' in res:
+                if cur.execute(
+                    'SELECT City, ProvinceState, Country '
+                    'FROM PostalCode '
+                    'WHERE PostalCode = %s',
+                    (res['PostalCode'],)
+                ) > 0:
+                    res_postal = cur.fetchone()
+                    city = res_postal['City']
+                    province_state = res_postal['ProvinceState']
+                    country = res_postal['Country']
+            cur.close()
+            return render_template(
+                'settings.html',
+                form=form,
+                first_name=res['FirstName'],
+                last_name=res['LastName'],
+                gender=res['Gender'],
+                age=res['Age'],
+                address=res['Address'],
+                postal_code=res['PostalCode'],
+                city=city,
+                province_state=province_state,
+                country=country
+            )
+    else:
+        return redirect(url_for('base'))
 
 class LoginForm(Form):
     username = StringField('Username', [
