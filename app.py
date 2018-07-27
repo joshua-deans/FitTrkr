@@ -110,6 +110,14 @@ def signup():
         cur.execute(
             'INSERT INTO Users(UserName, PasswordHash, PasswordSalt) VALUES (%s, %s, %s)',
             (username, b64_hash, b64_salt))
+        if client_trainer_option == 'trainer':
+            cur.execute(
+                'INSERT INTO Trainers(UserID) VALUES (%s)',
+                (cur.lastrowid,))
+        elif client_trainer_option == 'client':
+            cur.execute(
+                'INSERT INTO Clients(UserID) VALUES (%s)',
+                (cur.lastrowid,))
         mysql.connection.commit()
         cur.close()
         flash('You are now registered and can log in', 'success')
