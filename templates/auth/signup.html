@@ -25,6 +25,18 @@
                 <div class="form-group">
                     {{render_field(form.confirm, class_="form-control")}}
                 </div>
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="trainer_client_radio" id="client_radio"
+                               value="client" checked>
+                        <label class="form-check-label" for="client_radio">Client</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="trainer_client_radio" id="trainer_radio"
+                               value="trainer">
+                        <label class="form-check-label" for="trainer_radio">Trainer</label>
+                    </div>
+                </div>
                 <button class="btn btn-primary">Submit</button>
             </form>
 		</div>
