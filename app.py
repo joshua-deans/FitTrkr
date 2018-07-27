@@ -188,6 +188,7 @@ def settings():
             )
             mysql.connection.commit()
             cur.close()
+            flash('Profile Updated!', 'success')
             return redirect(url_for('settings'))
         else:
             cur = mysql.connection.cursor()
