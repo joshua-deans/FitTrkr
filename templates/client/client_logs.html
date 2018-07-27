@@ -48,6 +48,7 @@
 {% block body %}
     <div class="container-fluid">
         <h1 class="display-5" style="display: inline">Logs</h1>
+        
         <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal"
                 data-target="#logForm">
             <i class="fas fa-plus"></i>&nbsp;New Log
@@ -67,6 +68,9 @@
                         <th scope="col">Notes</th>
                         <th scope="col">Satisfaction Level</th>
                         <th scope="col">Meal Completion</th>
+                        <th scope="col">Delete Log</th>
+                        
+
                     </tr>
                     </thead>
                     <tbody>
@@ -80,6 +84,13 @@
                             <td>{{ item['Notes'] }}</td>
                             <td>{{ item['SatisfactionLevel'] }}</td>
                             <td>{{ item['MealCompletion'] }}</td>
+                            <td>
+                                <form action="{{url_for('delete_log', logid=item.LogID)}}" method="post">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="submit" value="DELETE" class="btn btn-danger" >
+
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

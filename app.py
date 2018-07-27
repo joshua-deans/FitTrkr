@@ -391,6 +391,7 @@ def client_logs(user_id, log_info=None):
                      notes, satisfaction, meal_completion))
         mysql.connection.commit()
         cur.close()
+        flash('New Log Created! Way To Go!', 'success')
         return redirect(url_for('client_logs', user_id=user_id))
     else:
         cur = mysql.connection.cursor()
@@ -406,6 +407,24 @@ def client_logs(user_id, log_info=None):
         return render_template('client/client_logs.html', log_info=log_info, user_id=user_id,
                                current_fitness_program=current_fitness_program)
 
+#Delete Log
+
+@app.route('/delete_log/<string:logid>', methods=['POST'])
+def delete_log(logid):
+    #Create Cursor
+    cur = mysql.connection.cursor()
+    #Store userid
+    user_id = cur.execute("select userid FROM logs where logid=%s", [str(logid)])
+    result = cur.fetchone()
+    cur.close()
+    #Delete Log
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM logs where logid= %s", [str(logid)])
+
+    mysql.connection.commit()
+    cur.close()
+    flash('Log Deleted! Go Make Another One!', 'success')
+    return redirect(url_for('client_logs', user_id=user_id))
 
 # TRAINER ROUTES
 
