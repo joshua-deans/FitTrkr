@@ -328,20 +328,41 @@ def client_browse_plans(user_id, plan_info=None):
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
-@app.route("/client/<int:user_id>/logs/")
+@app.route("/client/<int:user_id>/logs/", methods=['GET', 'POST'])
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
-    cur.execute(
-        'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
-        'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
-    result = cur.fetchall()
-    print(result)
-    if result:
-        log_info = result
+    cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
+    current_fitness_program = cur.fetchone();
     cur.close()
-    return render_template('client/client_logs.html', log_info=log_info, user_id=user_id)
+    if request.method == 'POST':
+        log_date = request.form.get('log-date')
+        weight = request.form.get('weight')
+        workout_completion = request.form.get('workout-completion')
+        meal_completion = request.form.get('meal-completion')
+        satisfaction = request.form.get('satisfaction')
+        notes = request.form.get('notes')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Logs(UserID, FitnessProgramID, LogDate, Weight, WorkoutCompletion, Notes, "
+                    "SatisfactionLevel, MealCompletion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (user_id, current_fitness_program['Current_FitnessProgram'], log_date, weight, workout_completion,
+                     notes, satisfaction, meal_completion))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('client_logs', user_id=user_id))
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
+            'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
+            'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
+        result = cur.fetchall()
+        print(result)
+        if result:
+            log_info = result
+        cur.close()
+        return render_template('client/client_logs.html', log_info=log_info, user_id=user_id,
+                               current_fitness_program=current_fitness_program)
 
 
 # TRAINER ROUTES
@@ -460,7 +481,6 @@ def workouts():
 def add_strength_workout():
     if request.method == 'POST':
         # Get Form Fields
-        print(request.form)
         workout_name = request.form.get('strength-workout-name')
         workout_intensity = request.form.get('strength-workout-intensity')
         workout_equipment = request.form.get('strength-workout-equipment')
@@ -485,7 +505,6 @@ def add_strength_workout():
 def add_cardio_workout():
     if request.method == 'POST':
         # Get Form Fields
-        print(request.form)
         workout_name = request.form.get('cardio-workout-name')
         workout_intensity = request.form.get('cardio-workout-intensity')
         workout_equipment = request.form.get('cardio-workout-equipment')
