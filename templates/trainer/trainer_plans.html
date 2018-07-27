@@ -90,7 +90,7 @@
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form method="post" action="/client/{{ user_id }}/logs/">
+                <form method="post" action="/trainer/{{ user_id }}/programs/">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">New Program</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -112,7 +112,7 @@
                         </select>
                         </select>
                         <label for="meal-plan" class="col-form-label">Meal Plan:</label>
-                        <select id="workout-plan" name="workout-plan" class="form-control">
+                        <select id="meal-plan" name="meal-plan" class="form-control">
                             {% for meal_plan in meal_plans %}
                                 <option>{{ meal_plan['MealPlanID'] }}. {{ meal_plan['MealPlanName'] }}</option>
                             {% endfor %}

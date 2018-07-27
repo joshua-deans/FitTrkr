@@ -439,28 +439,49 @@ def trainer_all_plans(user_id):
     return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
-@app.route("/trainer/<int:user_id>/programs/")
+@app.route("/trainer/<int:user_id>/programs/", methods=['GET', 'POST'])
 def trainer_plans(user_id):
     # Only the fitness plans made by the trainer
-    cur = mysql.connection.cursor()
-    cur.execute(
-        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
-        'f.MealPlanID, f.WorkoutPlanID '
-        'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
-    result = cur.fetchall()
-    cur.execute(
-        'SELECT * '
-        'FROM MealPlan m')
-    meal_plans = cur.fetchall()
-    cur.execute(
-        'SELECT * '
-        'FROM WorkoutPlan w')
-    workout_plans = cur.fetchall()
-    if result:
-        plan_info = result
-    cur.close()
-    return render_template('trainer/trainer_plans.html', plan_info=plan_info, user_id=user_id, meal_plans=meal_plans,
-                           workout_plans=workout_plans)
+    if request.method == 'POST':
+        program_name = request.form.get('program-name')
+        program_intensity = request.form.get('program-intensity')
+        program_length = request.form.get('program-length')
+        workout_plan = request.form.get('workout-plan')
+        meal_plan = request.form.get('meal-plan')
+        program_description = request.form.get('program-description')
+        workout_plan_id = workout_plan[0:workout_plan.find('.')]
+        meal_plan_id = meal_plan[0:meal_plan.find('.')]
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT INTO FitnessProgram(FitnessProgramName, FP_intensity, Description, Program_Length, TrainerID, '
+            'WorkoutPlanID, MealPlanID) VALUES (%s, %s, %s, %s, %s, %s, %s)', (program_name, program_intensity,
+                                                                               program_description, program_length,
+                                                                               str(user_id), workout_plan_id,
+                                                                               meal_plan_id))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('trainer_plans', user_id=user_id))
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+            'f.MealPlanID, f.WorkoutPlanID '
+            'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
+        result = cur.fetchall()
+        cur.execute(
+            'SELECT * '
+            'FROM MealPlan m')
+        meal_plans = cur.fetchall()
+        cur.execute(
+            'SELECT * '
+            'FROM WorkoutPlan w')
+        workout_plans = cur.fetchall()
+        if result:
+            plan_info = result
+        cur.close()
+        return render_template('trainer/trainer_plans.html', plan_info=plan_info, user_id=user_id,
+                               meal_plans=meal_plans,
+                               workout_plans=workout_plans)
 
 
 @app.route("/trainer/<int:user_id>/meal_plans/")
