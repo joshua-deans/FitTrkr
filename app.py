@@ -1,5 +1,4 @@
 import base64
-from datetime import datetime
 from os import urandom
 
 import scrypt
@@ -320,20 +319,41 @@ def client_browse_plans(user_id, plan_info=None):
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
 
 
-@app.route("/client/<int:user_id>/logs/")
+@app.route("/client/<int:user_id>/logs/", methods=['GET', 'POST'])
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
-    cur.execute(
-        'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
-        'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
-    result = cur.fetchall()
-    print(result)
-    if result:
-        log_info = result
+    cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
+    current_fitness_program = cur.fetchone();
     cur.close()
-    return render_template('client/client_logs.html', log_info=log_info, user_id=user_id)
+    if request.method == 'POST':
+        log_date = request.form.get('log-date')
+        weight = request.form.get('weight')
+        workout_completion = request.form.get('workout-completion')
+        meal_completion = request.form.get('meal-completion')
+        satisfaction = request.form.get('satisfaction')
+        notes = request.form.get('notes')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Logs(UserID, FitnessProgramID, LogDate, Weight, WorkoutCompletion, Notes, "
+                    "SatisfactionLevel, MealCompletion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (user_id, current_fitness_program['Current_FitnessProgram'], log_date, weight, workout_completion,
+                     notes, satisfaction, meal_completion))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('client_logs', user_id=user_id))
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
+            'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
+            'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
+        result = cur.fetchall()
+        print(result)
+        if result:
+            log_info = result
+        cur.close()
+        return render_template('client/client_logs.html', log_info=log_info, user_id=user_id,
+                               current_fitness_program=current_fitness_program)
 
 
 # TRAINER ROUTES
@@ -418,9 +438,9 @@ def trainer_workout_plans(user_id):
 @app.route("/workouts", methods=['GET', 'POST'])
 def workouts():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         WorkoutName = request.form['WorkoutName']
-        WorkoutNamePassed = '%' + WorkoutName + '%' 
+        WorkoutNamePassed = '%' + WorkoutName + '%'
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Workouts WHERE WorkoutName LIKE %s ", [WorkoutNamePassed])
         Workouts = cur.fetchall()
@@ -432,7 +452,7 @@ def workouts():
             return render_template('workouts.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Workouts")
         Workouts = cur.fetchall()
@@ -445,6 +465,55 @@ def workouts():
         cur.close()
 
     return render_template('workouts.html', workouts=Workouts)
+
+
+# Route for adding strength workouts
+@app.route("/add_strength_workout", methods=['POST'])
+def add_strength_workout():
+    if request.method == 'POST':
+        # Get Form Fields
+        workout_name = request.form.get('strength-workout-name')
+        workout_intensity = request.form.get('strength-workout-intensity')
+        workout_equipment = request.form.get('strength-workout-equipment')
+        workout_body_part = request.form.get('strength-body-part')
+        workout_strength_type = request.form.get('strength-type')
+        workout_description = request.form.get('strength-workout-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Workouts(Intensity, WorkoutDescription, Equipment, WorkoutName) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (workout_intensity, workout_description, workout_equipment, workout_name))
+        cur.execute("INSERT INTO Strength(WorkoutID, BodyPart, StrengthType) "
+                    "VALUES (%s, %s, %s)",
+                    (cur.lastrowid, workout_body_part, workout_strength_type))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('workouts'))
+
+
+# Route for adding cardio workouts
+@app.route("/add_cardio_workout", methods=['POST'])
+def add_cardio_workout():
+    if request.method == 'POST':
+        # Get Form Fields
+        workout_name = request.form.get('cardio-workout-name')
+        workout_intensity = request.form.get('cardio-workout-intensity')
+        workout_equipment = request.form.get('cardio-workout-equipment')
+        workout_distance = request.form.get('cardio-distance')
+        workout_duration = request.form.get('cardio-duration')
+        cardio_type = request.form.get('cardio-workout-type')
+        workout_description = request.form.get('cardio-workout-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Workouts(Intensity, WorkoutDescription, Equipment, WorkoutName) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (workout_intensity, workout_description, workout_equipment, workout_name))
+        cur.execute("INSERT INTO Cardio(WorkoutID, Distance, Duration, CardioType) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (cur.lastrowid, workout_distance, workout_duration, cardio_type))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('workouts'))
 
 
 @app.route("/workout/<string:workoutID>/")
@@ -466,9 +535,9 @@ def workout(workoutID):
 @app.route("/meals/", methods=['GET', 'POST'])
 def meals():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         MealName = request.form['MealName']
-        MealNamePassed = '%' + MealName + '%' 
+        MealNamePassed = '%' + MealName + '%'
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
         Meals = cur.fetchall()
@@ -480,7 +549,7 @@ def meals():
             return render_template('meals.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute("SELECT * FROM Meals")
         Meals = cur.fetchall()
@@ -488,24 +557,44 @@ def meals():
         if result > 0:
             return render_template('meals.html', meals=Meals)
         else:
-            msg = "No workouts Found"
+            msg = "No meals Found"
             return render_template('meals.html', msg=msg)
         cur.close()
 
     return render_template('meals.html', meals=Meals)
 
 
+# Route for adding meals
+@app.route("/add_meal", methods=['POST'])
+def add_meal():
+    if request.method == 'POST':
+        # Get Form Fields
+        meal_name = request.form.get('meal-name')
+        meal_type = request.form.get('meal-type')
+        calories = request.form.get('calories')
+        dietary_restrictions = request.form.get('dietary-restrictions')
+        meal_description = request.form.get('meal-description')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO Meals(MealName, MealType, CaloriesPerServing, DietaryRestrictions, MealDescription) "
+                    "VALUES (%s, %s, %s, %s, %s)",
+                    (meal_name, meal_type, calories, dietary_restrictions, meal_description))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('meals'))
+
+
 # Route for single meals
 @app.route("/meal/<string:mealID>/")
 def meal(mealID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID))
+    result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID,))
     Meal = cur.fetchone()
 
     if result > 0:
         return render_template('meal.html', meal=Meal)
     else:
-        msg = "No workouts Found"
+        msg = "No meals Found"
         return render_template('meals.html', msg=msg)
     cur.close()
 
@@ -516,21 +605,22 @@ def meal(mealID):
 @app.route("/trainers_search", methods=['GET', 'POST'])
 def trainers_search():
     if request.method == 'POST':
-        #Get Form Fields
+        # Get Form Fields
         TrainerUserName = request.form['UserName']
-        TrainerUserNamePassed = '%' + TrainerUserName + '%' 
+        TrainerUserNamePassed = '%' + TrainerUserName + '%'
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s " , [TrainerUserNamePassed] )
+        result = cur.execute("SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s ",
+                             [TrainerUserNamePassed])
         Trainers = cur.fetchall()
 
         if result > 0:
             return render_template('trainers.html', trainers=Trainers)
         else:
-            msg = "No meals Found"
+            msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
         cur.close()
 
-    else: 
+    else:
         cur = mysql.connection.cursor()
         result = cur.execute(
             'SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID')
@@ -539,7 +629,7 @@ def trainers_search():
         if result > 0:
             return render_template('trainers.html', trainers=Trainers)
         else:
-            msg = "No workouts Found"
+            msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
         cur.close()
 
@@ -552,13 +642,14 @@ def trainer_search(UserID):
     cur = mysql.connection.cursor()
     print(UserID)
     result = cur.execute('SELECT *'
-                        'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s', (UserID,UserID) )
+                         'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s',
+                         (UserID, UserID))
     Trainer = cur.fetchone()
 
     if result > 0:
         return render_template('trainer.html', trainer=Trainer)
     else:
-        msg = "No workouts Found"
+        msg = "No trainers Found"
         return render_template('trainers.html', msg=msg)
     cur.close()
 
