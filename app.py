@@ -92,13 +92,14 @@ def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
+        client_trainer_option = request.form['trainer_client_radio']
         #Checks to see if username already exists
         cur = mysql.connect.cursor()
         username_check = cur.execute(
             'SELECT * from Users WHERE UserName = %s', [username, ]
         )
         cur.close()
-        if username_check > 0:
+        if username_check > 0 or (not client_trainer_option):
            flash('Username is already taken, try a different one', 'danger')
            return render_template('auth/signup.html', form=form)
         salt = urandom(16)
