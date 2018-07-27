@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer', user_id=user_id) }}">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('trainer_plans', user_id=user_id) }}">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_meal_plans', user_id=user_id) }}">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_workout_plans', user_id=user_id) }}">Workout Plan</a>
+    </li>
+{% endblock %}
+
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="display-5" style="display: inline">Fitness Plans</h1>
+        <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal"
+                data-target="#programForm">
+            <i class="fas fa-plus"></i>&nbsp;New Fitness Plan
+        </button>
+        <br>
+        <br>
+        <div class="card mx-auto px-3 py-4">
+            {% if plan_info %}
+                <table class="table table-striped table-hover table-responsive-md">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Plan Description</th>
+                        <th scope="col">Trainer Name</th>
+                        <th scope="col">Program Intensity</th>
+                        <th scope="col">Program Duration</th>
+                        <th scope="col">Meal Plan</th>
+                        <th scope="col">Workout Plan</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in plan_info %}
+                        <tr>
+                            <th scope="row">{{ item['FitnessProgramID'] }}</th>
+                            <td>{{ item['Description'] }}</td>
+                            <td>{{ item['FirstName'] + " " + item['LastName'] }}</td>
+                            <td>{{ item['FP_intensity'] }}</td>
+                            <td>{{ item['Program_Length'] }}</td>
+                            <td>{{ item['MealPlanID'] }}</td>
+                            <td>{{ item['WorkoutPlanID'] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h5 class="display-5"><i>There are no plans</i></h5>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="programForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form method="post" action="/client/{{ user_id }}/logs/">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">New Program</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="program-name" class="col-form-label">Program Name</label>
+                        <input type="text" class="form-control" name="program-name" id="program-name" required>
+                        <label for="program-intensity" class="col-form-label">Intensity:</label>
+                        <input type="text" class="form-control" name="program-intensity" id="program-intensity">
+                        <label for="program-length" class="col-form-label">Program Length:</label>
+                        <input type="text" class="form-control" name="program-length" id="program-length">
+                        <label for="workout-plan" class="col-form-label">Workout Plan:</label>
+                        <select id="workout-plan" name="workout-plan" class="form-control">
+                            {% for workout_plan in workout_plans %}
+                                <option>{{ workout_plan['WorkoutPlanID'] }}. {{ workout_plan['WorkoutPlanName'] }}</option>
+                            {% endfor %}
+                        </select>
+                        </select>
+                        <label for="meal-plan" class="col-form-label">Meal Plan:</label>
+                        <select id="workout-plan" name="workout-plan" class="form-control">
+                            {% for meal_plan in meal_plans %}
+                                <option>{{ meal_plan['MealPlanID'] }}. {{ meal_plan['MealPlanName'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="program-description" class="col-form-label">Program Description:</label>
+                        <textarea class="form-control" name="program-description" id="program-description"
+                                  required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

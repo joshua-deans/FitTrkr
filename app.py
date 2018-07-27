@@ -366,7 +366,6 @@ def client_change_plan(user_id, program_id):
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
-<<<<<<< app.py
     cur.execute(
         'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
         'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
@@ -375,10 +374,8 @@ def client_logs(user_id, log_info=None):
     print(result)
     if result:
         log_info = result
-=======
     cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
     current_fitness_program = cur.fetchone();
->>>>>>> app.py
     cur.close()
     if request.method == 'POST':
         log_date = request.form.get('log-date')
@@ -451,10 +448,19 @@ def trainer_plans(user_id):
         'f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
+    cur.execute(
+        'SELECT * '
+        'FROM MealPlan m')
+    meal_plans = cur.fetchall()
+    cur.execute(
+        'SELECT * '
+        'FROM WorkoutPlan w')
+    workout_plans = cur.fetchall()
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
+    return render_template('trainer/trainer_plans.html', plan_info=plan_info, user_id=user_id, meal_plans=meal_plans,
+                           workout_plans=workout_plans)
 
 
 @app.route("/trainer/<int:user_id>/meal_plans/")
