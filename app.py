@@ -544,6 +544,21 @@ def trainer_plans(user_id):
                                workout_plans=workout_plans)
 
 
+@app.route("/trainer/<int:user_id>/programs/<int:program_id>")
+def trainer_plan_detail(user_id, program_id):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramName, f.Description, f.Program_Length '
+        'FROM FitnessProgram f WHERE f.FitnessProgramID = %s ', (program_id,))
+    program_details = cur.fetchone()
+    cur.execute(
+        'SELECT f.FitnessProgramName, f.Description, f.Program_Length '
+        'FROM FitnessProgram f, Clients c, Users u, Log l '
+        'WHERE f.FitnessProgramID = %s ', (program_id,))
+    client_details = cur.fetchone()
+    cur.close()
+    return render_template('trainer/plan_details.html', user_id=user_id, program_details=program_details)
+
 @app.route("/trainer/<int:user_id>/meal_plans/")
 def trainer_meal_plans(user_id):
     # Only the meal plans made by the trainer

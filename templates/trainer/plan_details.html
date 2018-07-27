@@ -43,9 +43,14 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container-fluid">
-        <h1 class="display-5" style="display: inline">Your Meal Plans</h1>
-        <button type="button" class="btn btn-primary float-right">New Meal Plan</button>
+    <div class="container-fluid mx-auto ">
+        <div class="card mx-auto px-3 py-4">
+            <div class="container">
+                <h2 class="display-5" style="display: inline">{{ program_details['FitnessProgramName'] }}</h2>
+                <p class="lead">{{ program_details['Description'] }}</p>
+                <p>Program length: {{ program_details['Program_Length'] }}</p>
+            </div>
+        </div>
         <br>
         <br>
         <div class="card mx-auto px-3 py-4">
@@ -73,7 +78,7 @@
                     </tbody>
                 </table>
             {% else %}
-                <h5 class="display-5"><i>There are no plans</i></h5>
+                <h5 class="display-5"><i>There are no users in your program</i></h5>
             {% endif %}
         </div>
     </div>
