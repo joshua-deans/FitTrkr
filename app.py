@@ -532,12 +532,12 @@ def create_mealplan2(user_id, mealplanid):
 
         if result > 0:
             flash('Matches Found', 'success')
+            cur.close()
             return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid = mealplanid, meals=meals)
-            #return render_template('meals.html', meals=Meals)
         else:
+            cur.close()
             return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
-            #return render_template('meals.html', msg=msg)
-        cur.close()
+            
 
     else:
         #Display Meals
@@ -560,8 +560,23 @@ def create_mealplan2(user_id, mealplanid):
 
 @app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
 def add_meal_2_mealplan(user_id,mealplanid,mealid):
+    #Let's add meal to mealplan
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from MealPlan where mealplanid = %s', [mealplanid]
+    )
+    result = cur.fetchone()
+    mealplanname = result['MealPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT INTO MealPlan_Meal(MealPlanID,MealPlanName,MealID) VALUES(%s,%s,%s)',(mealplanid, mealplanname,mealid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash('Meal added to your MealPlan', 'success')
+    return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
 
-    return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid,mealid=mealid)
 #### DELETE THISSS
 @app.route('/delete_log/<string:logid>', methods=['POST'])
 def delete_log(logid):
