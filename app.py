@@ -266,7 +266,7 @@ def login():
                     'token',
                     token,
                     86400,
-                    domain='127.0.0.1',
+                    # domain='127.0.0.1',
                     # secure=True,
                     httponly=True)
                 flash('You are now logged in', 'success')
