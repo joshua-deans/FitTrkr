@@ -357,7 +357,7 @@ VALUES
     (8, 'Dedicated to bringing out the inner athlete in you'),
     (9, 'Professional Athlete Development'),
     (10, 'Beginners');
-
+```
 ```
 INSERT INTO FitnessProgram
 VALUES
