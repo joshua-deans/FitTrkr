@@ -38,6 +38,7 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
             return True, result['UserID']
     return False, -1
 
+
 def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
     cookies = flask_request.cookies
     if 'token' in cookies:
@@ -53,7 +54,9 @@ def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
             return True
     return False
 
+
 app.jinja_env.globals.update(is_logged_in_bool=is_logged_in_bool)
+
 
 def verify_proper_user(logged_in_as, user_id):
     if not logged_in_as[0]:
@@ -64,18 +67,30 @@ def verify_proper_user(logged_in_as, user_id):
         return True
 
 
+def get_trainer_or_client(user_id):
+    cur = mysql.connect.cursor()
+    client_check = cur.execute(
+        'SELECT * from Clients WHERE UserId = %s', [user_id, ]
+    )
+    trainer_check = cur.execute(
+        'SELECT * from Trainers WHERE UserId = %s', [user_id, ]
+    )
+    cur.close()
+    if client_check > 0:
+        return 'client'
+    elif trainer_check > 0:
+        return 'trainer'
+
 # Route for landing page
 @app.route("/")
 def base():
     return render_template('base.html')
 
 
-
 # Route for about page
 @app.route("/about/")
 def about():
     return render_template('about.html')
-
 
 
 class SignupForm(Form):
@@ -91,20 +106,22 @@ class SignupForm(Form):
 
 # Route for sign up form
 
+
 @app.route("/signup/", methods=['GET', 'POST'])
 def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
-        #Checks to see if username already exists
+        client_trainer_option = request.form['trainer_client_radio']
+        # Checks to see if username already exists
         cur = mysql.connect.cursor()
         username_check = cur.execute(
             'SELECT * from Users WHERE UserName = %s', [username, ]
         )
         cur.close()
-        if username_check > 0:
-           flash('Username is already taken, try a different one', 'danger')
-           return render_template('auth/signup.html', form=form)
+        if username_check > 0 or (not client_trainer_option):
+            flash('Username is already taken, try a different one', 'danger')
+            return render_template('auth/signup.html', form=form)
         salt = urandom(16)
         password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
         b64_salt = base64.b64encode(salt)
@@ -113,11 +130,22 @@ def signup():
         cur.execute(
             'INSERT INTO Users(UserName, PasswordHash, PasswordSalt) VALUES (%s, %s, %s)',
             (username, b64_hash, b64_salt))
-        mysql.connection.commit()
-        cur.close()
+        if client_trainer_option == 'trainer':
+            cur.execute(
+                'INSERT INTO Trainers(UserID) VALUES (%s)',
+                (cur.lastrowid,))
+            mysql.connection.commit()
+            cur.close()
+        elif client_trainer_option == 'client':
+            cur.execute(
+                'INSERT INTO Clients(UserID) VALUES (%s)',
+                (cur.lastrowid,))
+            mysql.connection.commit()
+            cur.close()
         flash('You are now registered and can log in', 'success')
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
+
 
 class SettingsForm(Form):
     first_name = StringField('First name', [
@@ -157,6 +185,7 @@ class SettingsForm(Form):
         validators.Length(min=1, max=100)
     ])
 
+
 @app.route("/settings/", methods=['GET', 'POST'])
 def settings():
     form = SettingsForm(request.form)
@@ -183,12 +212,12 @@ def settings():
                 'PostalCode = %s '
                 'WHERE UserID = %s',
                 (form.first_name.data,
-                form.last_name.data,
-                form.gender.data,
-                form.age.data,
-                form.address.data,
-                form.postal_code.data,
-                user_id)
+                 form.last_name.data,
+                 form.gender.data,
+                 form.age.data,
+                 form.address.data,
+                 form.postal_code.data,
+                 user_id)
             )
             mysql.connection.commit()
             cur.close()
@@ -208,10 +237,10 @@ def settings():
             country = None
             if 'PostalCode' in res:
                 if cur.execute(
-                    'SELECT City, ProvinceState, Country '
-                    'FROM PostalCode '
-                    'WHERE PostalCode = %s',
-                    (res['PostalCode'],)
+                        'SELECT City, ProvinceState, Country '
+                        'FROM PostalCode '
+                        'WHERE PostalCode = %s',
+                        (res['PostalCode'],)
                 ) > 0:
                     res_postal = cur.fetchone()
                     city = res_postal['City']
@@ -234,6 +263,7 @@ def settings():
     else:
         return redirect(url_for('base'))
 
+
 class LoginForm(Form):
     username = StringField('Username', [
         validators.DataRequired(),
@@ -253,7 +283,7 @@ def login():
             'SELECT UserID, PasswordHash, PasswordSalt FROM Users WHERE UserName = %s',
             (username,))
         result = cur.fetchone()
-        if user_check >0:
+        if user_check > 0:
             db_hash = base64.b64decode(result['PasswordHash'])
             salt = base64.b64decode(result['PasswordSalt'])
             password_hash = scrypt.hash(form.password.data, salt, 32768, 8, 1, 32)
@@ -266,7 +296,13 @@ def login():
                     (user_id, token))
                 mysql.connection.commit()
                 cur.close()
-                resp = redirect(url_for('base'))
+                trainer_or_client = get_trainer_or_client(user_id)
+                if trainer_or_client == 'trainer':
+                    resp = redirect(url_for('trainer', user_id=user_id))
+                elif trainer_or_client == 'client':
+                    resp = redirect(url_for('client', user_id=user_id))
+                else:
+                    resp = redirect(url_for('login'))
                 resp.set_cookie(
                     'token',
                     token,
@@ -283,6 +319,7 @@ def login():
             flash('Invalid Username, Try again', 'danger')
             app.logger.info('NO USER')
     return render_template('auth/login.html', form=form)
+
 
 @app.route("/logout/")
 def logout():
@@ -301,6 +338,7 @@ def logout():
         )
     return resp
 
+
 # CLIENT ROUTES
 
 
@@ -309,7 +347,7 @@ def client(user_id):
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT * '
-        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', str(user_id))
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', (user_id,))
     user_result = cur.fetchone()
     cur.close()
     if user_result:
@@ -319,7 +357,7 @@ def client(user_id):
             'FROM Users u, FitnessProgram f, Clients c, Users u1, MealPlan m, WorkoutPlan w '
             'WHERE u.UserID = %s AND u.UserID = c.UserID AND c.Current_FitnessProgram = f.FitnessProgramID AND '
             'f.TrainerID = u1.UserID AND f.WorkoutPlanID = w.WorkoutPlanID AND f.MealPlanID = m.MealPlanID'
-            , str(user_id))
+            , (user_id,))
         program_result = cur.fetchone()
         print(program_result)
         cur.close()
@@ -342,7 +380,7 @@ def client_browse_plans(user_id, plan_info=None):
     result = cur.fetchall()
     cur.execute(
         'SELECT c.Current_FitnessProgram '
-        'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', str(user_id))
+        'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', (user_id,))
     curr_fitness_program = cur.fetchone()
     if result:
         plan_info = result
@@ -414,17 +452,18 @@ def client_logs(user_id, log_info=None):
         return render_template('client/client_logs.html', log_info=log_info, user_id=user_id,
                                current_fitness_program=current_fitness_program)
 
-#Delete Log
+
+# Delete Log
 
 @app.route('/delete_log/<string:logid>', methods=['POST'])
 def delete_log(logid):
-    #Create Cursor
+    # Create Cursor
     cur = mysql.connection.cursor()
-    #Store userid
+    # Store userid
     user_id = cur.execute("select userid FROM logs where logid=%s", [str(logid)])
     result = cur.fetchone()
     cur.close()
-    #Delete Log
+    # Delete Log
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM logs where logid= %s", [str(logid)])
 
@@ -432,6 +471,7 @@ def delete_log(logid):
     cur.close()
     flash('Log Deleted! Go Make Another One!', 'success')
     return redirect(url_for('client_logs', user_id=user_id))
+
 
 # TRAINER ROUTES
 
@@ -441,7 +481,7 @@ def trainer(user_id):
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT * '
-        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', str(user_id))
+        'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', (user_id,))
     result = cur.fetchone()
     cur.close()
     if result:

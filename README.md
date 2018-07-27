@@ -110,7 +110,7 @@ CREATE TABLE Strength
 CREATE TABLE MealPlan_Meal
 	(
 	MealPlanID INT(11) AUTO_INCREMENT,
-	MealPlanName VARCHAR(50) UNIQUE,
+	MealPlanName VARCHAR(50),
 	MealID INT(11),
 	MealTime CHAR(50),
 	Primary Key(MealplanID, MealID),
