@@ -241,8 +241,8 @@ CREATE TABLE Clients
 ```
 CREATE TABLE Logs
 	(
-	UserID INT(11) AUTO_INCREMENT,
-	LogID INT(11),
+	UserID INT(11) NOT NULL,
+	LogID INT(11) AUTO_INCREMENT,
 	FitnessProgramID INT NOT NULL,
 	LogDate DATE,
 	Weight DOUBLE,
@@ -250,7 +250,7 @@ CREATE TABLE Logs
 	Notes VARCHAR(1000),
 	SatisfactionLevel INT(11),
 	MealCompletion INT(11),
-	Primary Key(UserID, logID),
+	Primary Key(LogID),
 	Foreign Key(UserID) references Users(UserID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
@@ -434,13 +434,13 @@ VALUES
 ```
 
 ```
-INSERT INTO Logs
+INSERT INTO Logs(UserId, FitnessProgramID, LogDate, Weight, WorkoutCompletion, Notes, SatisfactionLevel, MealCompletion)
 VALUES
-    (1,1,1,'2018-05-01',90.5,5,'feels good',8,9),
-    (2,2,2,'2018-06-01',100.6,7,'feeling hotter',10,10),
-    (3,3,3,'2018-07-01',3000.2,8,'feeling gross', 2,1),
-    (4,4,4,'2018-08-01',120.4 ,10,'So bad, but so good',4,1),
-    (5,5,5,'2018-09-01',250.6,10,'I love my body',10 ,10);
+    (1,1,'2018-05-01',90.5,5,'feels good',8,9),
+    (2,2,'2018-06-01',100.6,7,'feeling hotter',10,10),
+    (3,3,'2018-07-01',3000.2,8,'feeling gross', 2,1),
+    (4,4,'2018-08-01',120.4 ,10,'So bad, but so good',4,1),
+    (5,5,'2018-09-01',250.6,10,'I love my body',10 ,10);
 
 ```
 Set Up db.py as follows:
