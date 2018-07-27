@@ -48,7 +48,7 @@ CREATE TABLE Meals
 	(
 	MealID INT(11) AUTO_INCREMENT,
 	MealType	VARCHAR(30),
-	MealName	VARCHAR(50),
+	MealName	VARCHAR(50) UNIQUE,
 	CaloriesPerServing	INT,
 	DietaryRestrictions	VARCHAR(300),
 	MealDescription    	VARCHAR(500),
@@ -74,7 +74,7 @@ CREATE TABLE Workouts
 	Intensity VARCHAR(30),
 	WorkoutDescription VARCHAR(500),
 	Equipment VARCHAR(300),
-	WorkoutName VARCHAR(140),
+	WorkoutName VARCHAR(140) UNIQUE,
 	Primary Key (WorkoutID)
 	);
 ```
@@ -110,7 +110,7 @@ CREATE TABLE Strength
 CREATE TABLE MealPlan_Meal
 	(
 	MealPlanID INT(11) AUTO_INCREMENT,
-	MealPlanName VARCHAR(50),
+	MealPlanName VARCHAR(50) UNIQUE,
 	MealID INT(11),
 	MealTime CHAR(50),
 	Primary Key(MealplanID, MealID),
@@ -127,7 +127,7 @@ CREATE TABLE MealPlan_Meal
 CREATE TABLE Workout_Comprise_WPlan
 	(
 	WorkoutPlanID INT(11),
-	WorkoutPlanName VARCHAR(50),
+	WorkoutPlanName VARCHAR(50) UNIQUE,
 	WorkOutID INT(11),
 	NumSets INT(11),
 	NumReps INT(11),
