@@ -366,19 +366,8 @@ def client_change_plan(user_id, program_id):
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
-<<<<<<< app.py
-    cur.execute(
-        'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
-        'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s ', str(user_id))
-    result = cur.fetchall()
-    print(result)
-    if result:
-        log_info = result
-=======
     cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
     current_fitness_program = cur.fetchone();
->>>>>>> app.py
     cur.close()
     if request.method == 'POST':
         log_date = request.form.get('log-date')
