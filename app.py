@@ -305,10 +305,21 @@ def client(user_id):
     cur.execute(
         'SELECT * '
         'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Clients)', str(user_id))
-    result = cur.fetchone()
+    user_result = cur.fetchone()
     cur.close()
-    if result:
-        return render_template('client/dashboard.html', user=result, request=request, user_id=user_id)
+    if user_result:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT f.FitnessProgramName, u1.UserName, u1.FirstName, u1.LastName, w.WorkoutPlanName, m.MealPlanName '
+            'FROM Users u, FitnessProgram f, Clients c, Users u1, MealPlan m, WorkoutPlan w '
+            'WHERE u.UserID = %s AND u.UserID = c.UserID AND c.Current_FitnessProgram = f.FitnessProgramID AND '
+            'f.TrainerID = u1.UserID AND f.WorkoutPlanID = w.WorkoutPlanID AND f.MealPlanID = m.MealPlanID'
+            , str(user_id))
+        program_result = cur.fetchone()
+        print(program_result)
+        cur.close()
+        return render_template('client/dashboard.html', user=user_result, fitness_program=program_result,
+                               request=request, user_id=user_id)
     else:
         return redirect('/')
 
@@ -318,22 +329,56 @@ def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
     cur.execute(
-        'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
-        'f.MealPlanID, f.WorkoutPlanID '
+        'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
+        'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
+    cur.execute(
+        'SELECT c.Current_FitnessProgram '
+        'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', str(user_id))
+    curr_fitness_program = cur.fetchone()
     if result:
         plan_info = result
     cur.close()
-    return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id)
+    return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
+                           curr_fitness_program=curr_fitness_program)
+
+
+@app.route("/client/<int:user_id>/change_program/<program_id>", methods=['POST'])
+def client_change_plan(user_id, program_id):
+    cur = mysql.connection.cursor()
+    if program_id == "NULL":
+        cur.execute(
+            'UPDATE Clients c '
+            'SET c.Current_FitnessProgram = NULL '
+            'WHERE c.UserID = %s', (user_id,))
+    else:
+        cur.execute(
+            'UPDATE Clients c '
+            'SET c.Current_FitnessProgram = %s '
+            'WHERE c.UserID = %s', (program_id, user_id))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('client_browse_plans', user_id=user_id))
 
 
 @app.route("/client/<int:user_id>/logs/", methods=['GET', 'POST'])
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
+<<<<<<< app.py
+    cur.execute(
+        'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
+        'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
+        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s ', str(user_id))
+    result = cur.fetchall()
+    print(result)
+    if result:
+        log_info = result
+=======
     cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
     current_fitness_program = cur.fetchone();
+>>>>>>> app.py
     cur.close()
     if request.method == 'POST':
         log_date = request.form.get('log-date')
