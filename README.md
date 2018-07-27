@@ -434,13 +434,13 @@ VALUES
 ```
 
 ```
-INSERT INTO Logs
+INSERT INTO Logs(UserId, FitnessProgramID, LogDate, Weight, WorkoutCompletion, Notes, SatisfactionLevel, MealCompletion)
 VALUES
-    (1,1,1,'2018-05-01',90.5,5,'feels good',8,9),
-    (2,2,2,'2018-06-01',100.6,7,'feeling hotter',10,10),
-    (3,3,3,'2018-07-01',3000.2,8,'feeling gross', 2,1),
-    (4,4,4,'2018-08-01',120.4 ,10,'So bad, but so good',4,1),
-    (5,5,5,'2018-09-01',250.6,10,'I love my body',10 ,10);
+    (1,1,'2018-05-01',90.5,5,'feels good',8,9),
+    (2,2,'2018-06-01',100.6,7,'feeling hotter',10,10),
+    (3,3,'2018-07-01',3000.2,8,'feeling gross', 2,1),
+    (4,4,'2018-08-01',120.4 ,10,'So bad, but so good',4,1),
+    (5,5,'2018-09-01',250.6,10,'I love my body',10 ,10);
 
 ```
 Set Up db.py as follows:
