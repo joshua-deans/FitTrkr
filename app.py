@@ -77,15 +77,36 @@ def get_trainer_or_client(user_id):
     elif trainer_check > 0:
         return 'trainer'
 
+
+def ensure_user_is_logged_in():
+    logged_in = is_logged_in(request)
+    trainer_or_client = get_trainer_or_client(logged_in[1])
+    if logged_in[0]:
+        if trainer_or_client == 'trainer':
+            resp = redirect(url_for('trainer', user_id=logged_in[1]))
+        elif trainer_or_client == 'client':
+            resp = redirect(url_for('client', user_id=logged_in[1]))
+        else:
+            resp = render_template('base.html')
+    else:
+        resp = None
+    return resp
+
 # Route for landing page
 @app.route("/")
 def base():
+    redir = ensure_user_is_logged_in()
+    if redir:
+        return redir
     return render_template('base.html')
 
 
 # Route for about page
 @app.route("/about/")
 def about():
+    redir = ensure_user_is_logged_in()
+    if redir:
+        return redir
     return render_template('about.html')
 
 
@@ -102,12 +123,15 @@ class SignupForm(Form):
 
 # Route for sign up form
 
-
 @app.route("/signup/", methods=['GET', 'POST'])
 def signup():
+    redir = ensure_user_is_logged_in()
+    if redir:
+        return redir
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
+        # Checks to see if username already exists
         client_trainer_option = request.form['trainer_client_radio']
         # Checks to see if username already exists
         cur = mysql.connect.cursor()
@@ -115,6 +139,9 @@ def signup():
             'SELECT * from Users WHERE UserName = %s', [username, ]
         )
         cur.close()
+        if username_check > 0:
+            flash('Username is already taken, try a different one', 'danger')
+            return render_template('auth/signup.html', form=form)
         if username_check > 0 or (not client_trainer_option):
             flash('Username is already taken, try a different one', 'danger')
             return render_template('auth/signup.html', form=form)
@@ -141,7 +168,6 @@ def signup():
         flash('You are now registered and can log in', 'success')
         return redirect(url_for('login'))
     return render_template('auth/signup.html', form=form)
-
 
 class SettingsForm(Form):
     first_name = StringField('First name', [
@@ -271,6 +297,9 @@ class LoginForm(Form):
 # Route for sign up form
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
+    redir = ensure_user_is_logged_in()
+    if redir:
+        return redir
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
