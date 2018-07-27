@@ -461,6 +461,45 @@ def trainer_meal_plans(user_id):
     cur.close()
     return render_template('trainer/meal_plans.html', meal_plan_info=plan_info, user_id=user_id)
 
+#Creating a new meal plan 
+
+class MealPlanForm(Form):
+    mealplanname = StringField('mealplanname', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    category = StringField('category', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    dietaryrestrictions = StringField('dietaryrestrictions', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    mealplandescription = StringField('mealplandescription', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=400)])  
+
+
+@app.route("/trainer/<int:user_id>/create_mealplan/", methods=['GET','POST'])
+def create_mealplan(user_id):
+    form = MealPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #Form Fields
+        mealplanname = form.mealplanname.data
+        category = form.category.data
+        dietaryrestrictions = form.dietaryrestrictions.data
+        mealplandescription = form.mealplandescription.data
+        #Cursor initiation 
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
+            'VALUES(%s,%s,%s,%s)', (mealplanname, category,dietaryrestrictions,mealplandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+
+
+    return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+
 
 @app.route("/trainer/<int:user_id>/workout_plans/")
 def trainer_workout_plans(user_id):
