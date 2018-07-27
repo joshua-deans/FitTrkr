@@ -348,7 +348,7 @@ VALUES
     (3,'Hillary Clinton Module', 'MED', 'Maintenance for the average joe/chloe'),
     (4,'The Express Train to Pain', 'HIGH', 'For people who really enjoy suffering'),
     (5,'Show Muscles Please!', 'LOW', 'For people who only want the illusion of working out');
-
+```
 ```
 INSERT INTO Trainers
 VALUES
