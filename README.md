@@ -187,7 +187,7 @@ CREATE TABLE Session
 
 ```
 CREATE TABLE Trainers
-(
+    (
 	UserID INT(11),
 	TrainerFocus VARCHAR(300),
 	Primary Key (UserID),
@@ -348,7 +348,7 @@ VALUES
     (3,'Hillary Clinton Module', 'MED', 'Maintenance for the average joe/chloe'),
     (4,'The Express Train to Pain', 'HIGH', 'For people who really enjoy suffering'),
     (5,'Show Muscles Please!', 'LOW', 'For people who only want the illusion of working out');
-
+```
 ```
 INSERT INTO Trainers
 VALUES
@@ -357,7 +357,7 @@ VALUES
     (8, 'Dedicated to bringing out the inner athlete in you'),
     (9, 'Professional Athlete Development'),
     (10, 'Beginners');
-
+```
 ```
 INSERT INTO FitnessProgram
 VALUES
