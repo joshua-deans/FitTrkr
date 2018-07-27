@@ -187,7 +187,7 @@ CREATE TABLE Session
 
 ```
 CREATE TABLE Trainers
-(
+    (
 	UserID INT(11),
 	TrainerFocus VARCHAR(300),
 	Primary Key (UserID),
