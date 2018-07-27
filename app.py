@@ -631,7 +631,7 @@ def add_cardio_workout():
 @app.route("/workout/<string:workoutID>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM Workouts WHERE WorkoutID = %s", (workoutID))
+    result = cur.execute("SELECT * FROM Workouts WHERE WorkoutID = %s", (workoutID,))
     Workout = cur.fetchone()
     cur.close()
     if result > 0:
