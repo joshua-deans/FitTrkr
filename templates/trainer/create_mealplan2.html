@@ -54,7 +54,7 @@
                                         <td>{{ meal['DietaryRestrictions'] }}</td>
                                         <td>{{ meal['CaloriesPerServing'] }}</td>
                                         <td>
-                                            <form action="{{url_for('add_meal2mealplan', )}}" method="post">
+                                            <form action="{{url_for('add_meal_2_mealplan', user_id=user_id, mealid = meal.MealID, )}}" method="post">
                                                 <input type="hidden" name="_method" value="ADD">
                                                 <input type="submit" value="ADD" class="btn btn-success" >
                                             </form>

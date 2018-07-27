@@ -558,6 +558,28 @@ def create_mealplan2(user_id, mealplanid):
             
     return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid)
 
+@app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
+def add_meal_2_mealplan(user_id,mealplanid,mealid):
+
+    return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid,mealid=mealid)
+#### DELETE THISSS
+@app.route('/delete_log/<string:logid>', methods=['POST'])
+def delete_log(logid):
+    #Create Cursor
+    cur = mysql.connection.cursor()
+    #Store userid 
+    user_id = cur.execute("select userid FROM logs where logid=%s", [str(logid)])
+    result = cur.fetchone()
+    cur.close()
+    #Delete Log
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM logs where logid= %s", [str(logid)])
+
+    mysql.connection.commit()
+    cur.close()
+    flash('Log Deleted! Go Make Another One!', 'success')
+    return redirect(url_for('client_logs', user_id=user_id))
+###### DELETE THISSS
 @app.route("/trainer/<int:user_id>/workout_plans/")
 def trainer_workout_plans(user_id):
     # Only the meal plans made by the trainer
