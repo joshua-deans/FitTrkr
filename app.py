@@ -667,7 +667,48 @@ def create_workoutplan(user_id):
     return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
 
 
+@app.route("/trainer/<int:user_id>/<int:workoutplanid>/create_workoutplan2/", methods=['GET','POST'])
+def create_workout_plan2(user_id, workoutplanid):
 
+        return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
+
+@app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
+def create_mealplan2(user_id, mealplanid):
+    if request.method == 'POST':
+        # Get Form Fields
+        MealName = request.form['MealName']
+        MealNamePassed = '%' + MealName + '%'
+        cur = mysql.connection.cursor()
+        result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
+        meals = cur.fetchall()
+
+        if result > 0:
+            flash('Matches Found', 'success')
+            cur.close()
+            return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid = mealplanid, meals=meals)
+        else:
+            cur.close()
+            return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+            
+
+    else:
+        #Display Meals
+        cur = mysql.connection.cursor()
+        result = cur.execute("select * from Meals")
+        meals = cur.fetchall()
+
+        if result > 0:
+            cur.close()
+            return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid = mealplanid, meals=meals)
+            #return render_template('meals.html', meals=Meals)
+        else:
+            flash('No Meals Found Try Again!', 'danger')
+            cur.close()
+            return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+            #return render_template('meals.html', msg=msg)
+        
+            
+    return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid)
 # Route for adding strength workouts
 @app.route("/add_strength_workout", methods=['POST'])
 def add_strength_workout():
