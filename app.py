@@ -242,6 +242,11 @@ def settings():
             flash('Profile Updated!', 'success')
             return redirect(url_for('settings'))
         else:
+            trainer_or_client = get_trainer_or_client(user_id)
+            if trainer_or_client == 'client':
+                client = True
+            else:
+                client = False
             cur = mysql.connection.cursor()
             cur.execute(
                 'SELECT * '
@@ -276,7 +281,9 @@ def settings():
                 postal_code=res['PostalCode'],
                 city=city,
                 province_state=province_state,
-                country=country
+                country=country,
+                user_id=is_logged_in(request)[1],
+                client=client
             )
     else:
         return redirect(url_for('base'))
@@ -288,6 +295,21 @@ class LoginForm(Form):
         validators.Length(min=1, max=30)])
     password = PasswordField('Password', [
         validators.DataRequired()])
+
+
+@app.route("/delete/<int:user_id>", methods=['POST'])
+def delete_self(user_id):
+    cur = mysql.connection.cursor()
+    delete_user = cur.execute(
+        'DELETE FROM Users WHERE UserID = %s',
+        (user_id,))
+    mysql.connection.commit()
+    if delete_user:
+        flash('Success! Your account was deleted.', 'success')
+        return redirect(url_for('logout'))
+    else:
+        flash('Error! Your account could not be deleted!', 'error')
+        return redirect(url_for('settings'))
 
 
 # Route for sign up form
@@ -786,7 +808,6 @@ def workouts():
             return render_template('workouts.html', msg=msg)
 
 
-
 # Route for adding strength workouts
 @app.route("/add_strength_workout", methods=['POST'])
 def add_strength_workout():
@@ -849,7 +870,6 @@ def workout(workoutID):
         return render_template('workouts.html', msg=msg)
 
 
-
 # Route for meals
 @app.route("/meals/", methods=['GET', 'POST'])
 def meals():
@@ -885,7 +905,6 @@ def meals():
             return render_template('meals.html', msg=msg)
 
 
-
 # Route for adding meals
 @app.route("/add_meal", methods=['POST'])
 def add_meal():
@@ -919,7 +938,6 @@ def meal(mealID):
     else:
         msg = "No meals Found"
         return render_template('meals.html', msg=msg)
-
 
 
 # Route for trainers
