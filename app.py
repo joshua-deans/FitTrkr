@@ -567,6 +567,129 @@ def trainer_meal_plans(user_id):
     cur.close()
     return render_template('trainer/meal_plans.html', meal_plan_info=plan_info, user_id=user_id)
 
+#Creating a new meal plan 
+
+class MealPlanForm(Form):
+    mealplanname = StringField('mealplanname', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    category = StringField('category', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    dietaryrestrictions = StringField('dietaryrestrictions', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    mealplandescription = StringField('mealplandescription', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=400)])  
+
+
+@app.route("/trainer/<int:user_id>/create_mealplan/", methods=['GET','POST'])
+def create_mealplan(user_id):
+    form = MealPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #Form Fields
+        mealplanname = form.mealplanname.data
+        category = form.category.data
+        dietaryrestrictions = form.dietaryrestrictions.data
+        mealplandescription = form.mealplandescription.data
+        #Checking to see if a mealplan has that name
+        cur = mysql.connection.cursor()
+        mealplan_check = cur.execute(
+            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+        )
+        cur.close()
+        if mealplan_check > 0:
+            flash('The Meal Plan Name is already taken! Try another one', 'danger')
+            return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+        #Creating MealPlan 
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
+            'VALUES(%s,%s,%s,%s)', (mealplanname, category,dietaryrestrictions,mealplandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        #Fetching MealPlanID
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+        )
+        result = cur.fetchone()
+        mealplanid = result['MealPlanID']
+        cur.close()
+        flash('Meal plan created! Go add some meals in!', 'success')
+        return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+
+    return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+    #ROUTE WORKS 
+@app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
+def create_mealplan2(user_id, mealplanid):
+    if request.method == 'POST':
+        # Get Form Fields
+        MealName = request.form['MealName']
+        MealNamePassed = '%' + MealName + '%'
+        cur = mysql.connection.cursor()
+        result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
+        meals = cur.fetchall()
+
+        if result > 0:
+            flash('Matches Found', 'success')
+            cur.close()
+            return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid = mealplanid, meals=meals)
+        else:
+            cur.close()
+            return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+            
+
+    else:
+        #Display Meals
+        cur = mysql.connection.cursor()
+        result = cur.execute("select * from Meals")
+        meals = cur.fetchall()
+
+        if result > 0:
+            cur.close()
+            return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid = mealplanid, meals=meals)
+            #return render_template('meals.html', meals=Meals)
+        else:
+            flash('No Meals Found Try Again!', 'danger')
+            cur.close()
+            return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+            #return render_template('meals.html', msg=msg)
+        
+            
+    return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid)
+
+@app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
+def add_meal_2_mealplan(user_id,mealplanid,mealid):
+    #check if meal in mealplan
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        'select * from MealPlan_Meal where mealplanid = %s AND mealid = %s',(mealplanid,mealid)
+    )
+    if result > 0:
+        flash("You already added this meal", 'danger')
+        cur.close()
+        return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+    cur.close()
+    #Let's add meal to mealplan
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from MealPlan where mealplanid = %s', [mealplanid]
+    )
+    result = cur.fetchone()
+    mealplanname = result['MealPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT INTO MealPlan_Meal(MealPlanID,MealPlanName,MealID) VALUES(%s,%s,%s)',(mealplanid, mealplanname,mealid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash('Meal added to your MealPlan', 'success')
+    return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+
 
 @app.route("/trainer/<int:user_id>/workout_plans/")
 def trainer_workout_plans(user_id):
