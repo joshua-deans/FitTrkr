@@ -524,22 +524,31 @@ def trainer(user_id):
         'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', (user_id,))
     result = cur.fetchone()
     # Division query: Find all clients who are taking all of the trainer's programs (Superstars)
-    cur.execute(
-        'SELECT u.FirstName, u.LastName '
-        'FROM Users u '
-        'WHERE NOT EXISTS( '
-        '  SELECT * '
-        '  FROM FitnessProgram f '
-        '  WHERE NOT EXISTS( '
-        '    SELECT * '
-        '    FROM Logs l '
-        '    WHERE u.UserID = l.UserID AND '
-        '    l.FitnessProgramID = f.FitnessProgramID '
-        '  ) AND '
-        '  f.TrainerID = %s '
-        ')', (user_id,)
+    # If trainer has no fitness program, skip the query (would return all users: divison by zero is infinity)
+    num_programs = cur.execute(
+        'SELECT * '
+        'FROM FitnessProgram '
+        'WHERE TrainerID = %s',
+        (user_id,)
     )
-    superstars = cur.fetchall()
+    superstars = None
+    if num_programs > 0:
+        cur.execute(
+            'SELECT u.FirstName, u.LastName '
+            'FROM Users u '
+            'WHERE NOT EXISTS( '
+            '  SELECT * '
+            '  FROM FitnessProgram f '
+            '  WHERE NOT EXISTS( '
+            '    SELECT * '
+            '    FROM Logs l '
+            '    WHERE u.UserID = l.UserID AND '
+            '    l.FitnessProgramID = f.FitnessProgramID '
+            '  ) AND '
+            '  f.TrainerID = %s '
+            ')', (user_id,)
+        )
+        superstars = cur.fetchall()
     cur.close()
     if result:
         return render_template('trainer/dashboard.html', user=result, user_id=user_id, superstars=superstars)
@@ -743,7 +752,6 @@ def create_mealplan2(user_id, mealplanid):
             #return render_template('meals.html', msg=msg)
 
 
-    return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid)
 
 @app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
 def add_meal_2_mealplan(user_id,mealplanid,mealid):
