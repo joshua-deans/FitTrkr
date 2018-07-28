@@ -411,7 +411,7 @@ VALUES
     (2,'Delishhh!!',4,'lunch/dinner'),
     (1,'Green is Clean',7,'lunch/dinner' ),
     (1,'Green is Clean',8,'breakfast/dinner' ),
-    (1,'Green is Clean',9,'breakfast/lunch' );
+    (1,'Green is Clean',9,'breakfast/lunch' ),
     (1,'Green is Clean',10,'breakfast/dinner' ),
     (1,'Green is Clean',11,'lunch/dinner' ),
     (1,'Green is Clean',12,'lunch/dinner' ),
