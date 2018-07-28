@@ -54,8 +54,23 @@ def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
             return True
     return False
 
+def is_logged_in_userid(flask_request: Flask.request_class) -> int:
+    cookies = flask_request.cookies
+    if 'token' in cookies:
+        token = cookies.get('token')
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT UserID FROM Session WHERE Token = %s',
+            (token,))
+        result = cur.fetchone()
+        if result is None:
+            return False, -1
+        if 'UserID' in result:
+            return result['UserID']
+    return -1
 
 app.jinja_env.globals.update(is_logged_in_bool=is_logged_in_bool)
+app.jinja_env.globals.update(is_logged_in_userid=is_logged_in_userid)
 
 
 def verify_proper_user(logged_in_as, user_id):
@@ -80,6 +95,9 @@ def get_trainer_or_client(user_id):
         return 'client'
     elif trainer_check > 0:
         return 'trainer'
+
+app.jinja_env.globals.update(get_trainer_or_client=get_trainer_or_client)
+
 
 # Route for landing page
 @app.route("/")
@@ -382,8 +400,8 @@ def client_browse_plans(user_id, plan_info=None):
         'SELECT c.Current_FitnessProgram '
         'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', (user_id,))
     curr_fitness_program = cur.fetchone()
-    if result:
-        plan_info = result
+    
+    plan_info = result
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
                            curr_fitness_program=curr_fitness_program, count=count)
@@ -414,7 +432,7 @@ def client_logs(user_id, log_info=None):
     cur.execute(
         'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
         'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s ', str(user_id))
+        'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s ', [str(user_id)])
     result = cur.fetchall()
     print(result)
     if result:
@@ -443,7 +461,7 @@ def client_logs(user_id, log_info=None):
         cur.execute(
             'SELECT l.LogID, f.FitnessProgramID, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
             'l.MealCompletion FROM FitnessProgram f, Logs l, Users u WHERE l.UserID = u.UserID AND '
-            'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', str(user_id))
+            'l.FitnessProgramID = f.FitnessProgramID AND u.UserID = %s', [str(user_id)])
         result = cur.fetchall()
         print(result)
         if result:
@@ -501,8 +519,8 @@ def trainer_all_plans(user_id, plan_info=None):
         'f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
-    if result:
-        plan_info = result
+    
+    plan_info = result
     cur.close()
     return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id, count=count)
 
@@ -534,7 +552,7 @@ def trainer_plans(user_id):
         cur.execute(
             'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
             'f.MealPlanID, f.WorkoutPlanID '
-            'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', str(user_id))
+            'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', [str(user_id)])
         result = cur.fetchall()
         cur.execute(
             'SELECT * '
@@ -544,8 +562,8 @@ def trainer_plans(user_id):
             'SELECT * '
             'FROM WorkoutPlan w')
         workout_plans = cur.fetchall()
-        if result:
-            plan_info = result
+        
+        plan_info = result
         cur.close()
         return render_template('trainer/trainer_plans.html', plan_info=plan_info, user_id=user_id,
                                meal_plans=meal_plans,
@@ -559,11 +577,11 @@ def trainer_meal_plans(user_id):
     cur.execute(
         'SELECT m.MealPlanID, m.Category, m.DietaryRestrictions, m.MealPlanDescription, '
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
-        'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
+        'm.MealPlanID = f.MealPlanID AND u.UserID = %s', [str(user_id)])
     result = cur.fetchall()
     print(result)
-    if result:
-        plan_info = result
+    
+    plan_info = result
     cur.close()
     return render_template('trainer/meal_plans.html', meal_plan_info=plan_info, user_id=user_id)
 
@@ -698,10 +716,10 @@ def trainer_workout_plans(user_id):
     cur.execute(
         'SELECT w.WorkoutPlanID, w.Intensity, w.PlanDescription, '
         'f.FitnessProgramID FROM FitnessProgram f, WorkoutPlan w, Users u WHERE f.TrainerID = u.UserID AND '
-        'w.WorkoutPlanID = f.WorkoutPlanID AND u.UserID = %s', str(user_id))
+        'w.WorkoutPlanID = f.WorkoutPlanID AND u.UserID = %s', [str(user_id)])
     result = cur.fetchall()
-    if result:
-        plan_info = result
+    
+    plan_info = result
     cur.close()
     return render_template('trainer/workout_plans.html', workout_plan_info=plan_info, user_id=user_id)
 

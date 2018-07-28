@@ -1,45 +1,10 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 <!-TODO: Replace client with User name ->
 {% block title %}Your Meal Plans{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
-{% endblock %}
-
-{% block nav_items %}
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('trainer', user_id=user_id) }}">Dashboard</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('trainer_plans', user_id=user_id) }}">Program</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ url_for('trainer_meal_plans', user_id=user_id) }}">Meal Plan</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('trainer_workout_plans', user_id=user_id) }}">Workout Plan</a>
-    </li>
-{% endblock %}
-
-{% block nav_items_right %}
-    <li class="nav-item">
-        <a class="nav-link" href="/#">Logout</a>
-    </li>
-
-    <li class="nav-item dropdown">
-        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <!-- Search all meals by Workout name, meal name, trainer
-            As you click each you see all the pages, then on the page
-            itself there is a search box that would run the query-->
-            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
-            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
-            <li><a class="dropdown-item" href="/meals">Meals</a></li>
-            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
-        </ul>
-    </li>
 {% endblock %}
 
 {% block body %}
