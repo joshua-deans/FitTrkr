@@ -669,8 +669,43 @@ def create_workoutplan(user_id):
 
 @app.route("/trainer/<int:user_id>/<int:workoutplanid>/create_workoutplan2/", methods=['GET','POST'])
 def create_workout_plan2(user_id, workoutplanid):
+    if request.method == 'POST':
+        #Get workoutname
+        workoutname = request.form['WorkoutName']
+        workoutnamepassed = '%' + workoutname + '%'
+        cur = mysql.connection.cursor()
+        result = cur.execute(
+            'select * from workouts where workoutname like %s', [workoutname]
+        )
+        workouts = cur.fetchall()
 
+        if result > 0:
+            flash('Matches Found', 'success')
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+        else:
+            cur.close()
+            return redirect(url_for('create_create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
         return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
+    else:
+        #Display Workouts
+        cur = mysql.connection.cursor()
+        result = cur.execute("select * from workouts")
+        workouts = cur.fetchall()
+
+        if result > 0:
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+            #return render_template('meals.html', meals=Meals)
+        else:
+            flash('No Workouts Found Try Again!', 'danger')
+            cur.close()
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+            #return render_template('meals.html', msg=msg)
+        
+            
+    return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
+        
 
 @app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
 def create_mealplan2(user_id, mealplanid):
