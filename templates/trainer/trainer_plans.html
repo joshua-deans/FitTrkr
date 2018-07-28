@@ -68,7 +68,11 @@
                         <tr>
                             <th scope="row">{{ item['FitnessProgramID'] }}</th>
                             <td>{{ item['Description'] }}</td>
+                            {% if item['FirstName'] == NULL and item['LastName'] == NULL %}
                             <td>{{ item['FirstName'] + " " + item['LastName'] }}</td>
+                            {% else %}
+                                <td>{{ item['UserName'] }}</td>
+                            {% endif %}
                             <td>{{ item['FP_intensity'] }}</td>
                             <td>{{ item['Program_Length'] }}</td>
                             <td>{{ item['MealPlanID'] }}</td>
