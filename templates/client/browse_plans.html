@@ -45,10 +45,18 @@
                             </form>
                         </th>
                     {% endif %}
-                    <th scope="row">{{ item['FitnessProgramID'] }}</th>
+                    <th scope="row">
+                        <a href="{{ url_for('client_plan_details', user_id=user_id, program_id= item['FitnessProgramID'] ) }}">
+                            {{ item['FitnessProgramID'] }}
+                        </a>
+                    </th>
                     <td>{{ item['FitnessProgramName'] }}</td>
                     <td>{{ item['Description'] }}</td>
+                    {% if item['FirstName'] and item['LastName'] %}
                     <td>{{ item['FirstName'] + " " + item['LastName'] }}</td>
+                    {% else %}
+                        <td>{{ item['UserName'] }}</td>
+                    {% endif %}
                     <td>{{ item['FP_intensity'] }}</td>
                     <td>{{ item['Program_Length'] }}</td>
                     <td>{{ item['MealPlanID'] }}</td>
