@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} FitTrkr Workouts {% endblock %}
+{% block title %} FitTracker Workouts {% endblock %}
 
 {% block body %}
     <div class="container">
@@ -16,7 +16,6 @@
                 </button>
                 <nav class="nav">
                     <a class="px-2 nav-link" href="/trainers_search"><h1> Trainers </h1></a>
-                    <a class="px-2 nav-link" href="/meals"><h1>Meals</h1></a>
                     <h1 class="px-2 nav-link active"> Workouts</h1>
                 </nav>
                 <div class="container-fluid workoutsList">
@@ -57,6 +56,12 @@
                                         <td>{{ workout['Intensity'] }}</td>
                                         <td>{{ workout['WorkoutDescription'] }}</td>
                                         <td>{{ workout['Equipment'] }}</td>
+                                        <td>
+                                            <form action="{{url_for('add_workout_2_workoutplan', user_id=user_id, workoutplanid= workoutplanid, workoutid = workout.WorkoutID)}}" method="post">
+                                                <input type="hidden" name="_method" value="ADD">
+                                                <input type="submit" value="ADD" class="btn btn-success" >
+                                            </form>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

@@ -99,15 +99,68 @@ def get_trainer_or_client(user_id):
 app.jinja_env.globals.update(get_trainer_or_client=get_trainer_or_client)
 
 
+
+def check_if_ids_match(url_user_id, current_user_id):
+    if url_user_id == current_user_id:
+        return None
+    else:
+        trainer_or_client = get_trainer_or_client(current_user_id)
+        if trainer_or_client == 'trainer':
+            resp = redirect(url_for('trainer', user_id=current_user_id))
+        elif trainer_or_client == 'client':
+            resp = redirect(url_for('client', user_id=current_user_id))
+        return resp
+
+
+def ensure_user_is_not_logged_in():
+    logged_in = is_logged_in(request)
+    trainer_or_client = get_trainer_or_client(logged_in[1])
+    if logged_in[0]:
+        if trainer_or_client == 'trainer':
+            resp = redirect(url_for('trainer', user_id=logged_in[1]))
+        elif trainer_or_client == 'client':
+            resp = redirect(url_for('client', user_id=logged_in[1]))
+        else:
+            resp = render_template('base.html')
+    else:
+        resp = None
+    return resp
+
+
+def ensure_user_is_logged_in_properly(url_user_id):
+    logged_in = is_logged_in(request)
+    current_user_id = logged_in[1]
+    trainer_or_client = get_trainer_or_client(current_user_id)
+    if not logged_in[0]:
+        resp = render_template('base.html')
+        return resp
+    elif current_user_id != url_user_id:
+        if trainer_or_client == 'trainer':
+            resp = redirect(url_for('trainer', user_id=current_user_id))
+        elif trainer_or_client == 'client':
+            resp = redirect(url_for('client', user_id=current_user_id))
+        else:
+            resp = render_template('base.html')
+        return resp
+    else:
+        return None
+
+
 # Route for landing page
 @app.route("/")
 def base():
+    redir = ensure_user_is_not_logged_in()
+    if redir:
+        return redir
     return render_template('base.html')
 
 
 # Route for about page
 @app.route("/about/")
 def about():
+    redir = ensure_user_is_not_logged_in()
+    if redir:
+        return redir
     return render_template('about.html')
 
 
@@ -129,9 +182,11 @@ class SignupForm(Form):
 
 # Route for sign up form
 
-
 @app.route("/signup/", methods=['GET', 'POST'])
 def signup():
+    redir = ensure_user_is_not_logged_in()
+    if redir:
+        return redir
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
@@ -144,6 +199,9 @@ def signup():
             'SELECT * from Users WHERE UserName = %s', [username]
         )
         cur.close()
+        if username_check > 0:
+            flash('Username is already taken, try a different one', 'danger')
+            return render_template('auth/signup.html', form=form)
         if username_check > 0 or (not client_trainer_option):
             flash('Username is already taken, try a different one', 'danger')
             return render_template('auth/signup.html', form=form)
@@ -219,14 +277,31 @@ def settings():
         user_id = is_logged_in(request)[1]
         if request.method == 'POST' and form.validate():
             cur = mysql.connection.cursor()
-            cur.execute(
-                'REPLACE INTO PostalCode(PostalCode, City, ProvinceState, Country) '
-                'VALUES (%s, %s, %s, %s)',
-                (form.postal_code.data,
-                 form.city.data,
-                 form.province_state.data,
-                 form.country.data)
+            num_entries = cur.execute(
+                'SELECT * '
+                'FROM PostalCode '
+                'WHERE PostalCode = %s',
+                (form.postal_code.data,)
             )
+            if num_entries > 0:
+                cur.execute(
+                    'UPDATE PostalCode '
+                    'SET City = %s, ProvinceState = %s, Country = %s '
+                    'WHERE PostalCode = %s',
+                    (form.city.data,
+                     form.province_state.data,
+                     form.country.data,
+                     form.postal_code.data)
+                )
+            else:
+                cur.execute(
+                    'INSERT INTO PostalCode(PostalCode, City, ProvinceState, Country) '
+                    'VALUES (%s, %s, %s, %s)',
+                    (form.postal_code.data,
+                     form.city.data,
+                     form.province_state.data,
+                     form.country.data)
+                )
             mysql.connection.commit()
             cur.execute(
                 'UPDATE Users '
@@ -323,6 +398,9 @@ def delete_self(user_id):
 # Route for sign up form
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
+    redir = ensure_user_is_not_logged_in()
+    if redir:
+        return redir
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
@@ -392,6 +470,9 @@ def logout():
 
 @app.route("/client/<int:user_id>/")
 def client(user_id):
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT * '
@@ -415,9 +496,37 @@ def client(user_id):
         return redirect('/')
 
 
+# @app.route("/client/<int:user_id>/program_detail/")
+# def client_browse_plan_detail(user_id, plan_info=None):
+#     # Browse all of the fitness plans
+#     redir = ensure_user_is_logged_in_properly(user_id)
+#     if redir:
+#         return redir
+#     cur = mysql.connection.cursor()
+#     cur.execute('SELECT COUNT(*) FROM FitnessProgram')
+#     count = cur.fetchone()['COUNT(*)']
+#     cur.execute(
+#         'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
+#         'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
+#         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+#     result = cur.fetchall()
+#     cur.execute(
+#         'SELECT c.Current_FitnessProgram '
+#         'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', (user_id,))
+#     curr_fitness_program = cur.fetchone()
+#
+#     plan_info = result
+#     cur.close()
+#     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
+#                            curr_fitness_program=curr_fitness_program, count=count)
+
+
 @app.route("/client/<int:user_id>/programs/")
 def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute('SELECT COUNT(*) FROM FitnessProgram')
     count = cur.fetchone()['COUNT(*)']
@@ -440,6 +549,9 @@ def client_browse_plans(user_id, plan_info=None):
 @app.route("/client/<int:user_id>/change_program/<program_id>", methods=['POST'])
 def client_change_plan(user_id, program_id):
     cur = mysql.connection.cursor()
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     if program_id == "NULL":
         cur.execute(
             'UPDATE Clients c '
@@ -458,6 +570,9 @@ def client_change_plan(user_id, program_id):
 @app.route("/client/<int:user_id>/logs/", methods=['GET', 'POST'])
 def client_logs(user_id, log_info=None):
     # Browse all of the fitness plans
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT l.LogID, f.FitnessProgramName, l.LogDate, l.Weight, l.WorkoutCompletion, l.Notes, l.SatisfactionLevel, '
@@ -526,6 +641,9 @@ def delete_log(logid):
 
 @app.route("/trainer/<int:user_id>/")
 def trainer(user_id):
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT * '
@@ -539,8 +657,10 @@ def trainer(user_id):
         'WHERE TrainerID = %s',
         (user_id,)
     )
+    programs = None
     superstars = None
     if num_programs > 0:
+        programs = cur.fetchall()
         cur.execute(
             'SELECT u.FirstName, u.LastName '
             'FROM Users u '
@@ -557,9 +677,30 @@ def trainer(user_id):
             ')', (user_id,)
         )
         superstars = cur.fetchall()
+    clients = None
+    num_clients = cur.execute(
+        'SELECT u.FirstName, u.LastName '
+        'FROM Users u, Logs l, FitnessProgram f '
+        'WHERE u.UserID = l.UserID AND '
+        'l.FitnessProgramID = f.FitnessProgramID AND '
+        'f.TrainerID = %s', (user_id,)
+    )
+    if num_clients > 0:
+        clients = cur.fetchall()
+    logs = None
+    num_logs = cur.execute(
+        'SELECT l.LogID, l.SatisfactionLevel '
+        'FROM Logs l, FitnessProgram f '
+        'WHERE l.FitnessProgramID = f.FitnessProgramID AND '
+        'f.TrainerID = %s', (user_id,)
+    )
+    if num_logs > 0:
+        logs = cur.fetchall()
     cur.close()
     if result:
-        return render_template('trainer/dashboard.html', user=result, user_id=user_id, superstars=superstars)
+        return render_template('trainer/dashboard.html',
+                               user=result, user_id=user_id, superstars=superstars,
+                               programs=programs, clients=clients, logs=logs)
     else:
         return redirect('/')
 
@@ -567,6 +708,9 @@ def trainer(user_id):
 @app.route("/trainer/<int:user_id>/all_programs/")
 def trainer_all_plans(user_id, plan_info=None):
     # All fitness plans made by all of the trainers
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute('SELECT COUNT(*) FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     count = cur.fetchone()['COUNT(*)']
@@ -604,9 +748,12 @@ def trainer_plans(user_id):
         cur.close()
         return redirect(url_for('trainer_plans', user_id=user_id))
     else:
+        redir = ensure_user_is_logged_in_properly(user_id)
+        if redir:
+            return redir
         cur = mysql.connection.cursor()
         cur.execute(
-            'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+            'SELECT f.FitnessProgramID, u.FirstName, u.LastName, u.UserName, f.FP_intensity, f.Description, f.Program_Length, '
             'f.MealPlanID, f.WorkoutPlanID '
             'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', [str(user_id)])
         result = cur.fetchall()
@@ -656,6 +803,9 @@ def trainer_plan_detail(user_id, program_id):
 @app.route("/trainer/<int:user_id>/meal_plans/")
 def trainer_meal_plans(user_id):
     # Only the meal plans made by the trainer
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT m.MealPlanID, m.Category, m.DietaryRestrictions, m.MealPlanDescription, '
@@ -794,6 +944,9 @@ def add_meal_2_mealplan(user_id,mealplanid,mealid):
 @app.route("/trainer/<int:user_id>/workout_plans/")
 def trainer_workout_plans(user_id):
     # Only the meal plans made by the trainer
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT w.WorkoutPlanID, w.Intensity, w.PlanDescription, '
@@ -839,6 +992,124 @@ def workouts():
         else:
             msg = "No workouts Found"
             return render_template('workouts.html', msg=msg)
+
+
+class WorkOutPlanForm(Form):
+    workoutplanname = StringField('workoutplanname', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)])
+    intensity = StringField('intensity', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    plandescription = StringField('plandescription', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=400)])  
+
+@app.route("/trainer/<int:user_id>/create_workoutplan/", methods=['GET','POST'])
+def create_workoutplan(user_id):
+    form = WorkOutPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #FORM FIELDS
+        workoutplanname = form.workoutplanname.data
+        intensity = form.intensity.data
+        plandescription = form.plandescription.data
+        #Check to see if workoutplan already exists 
+        cur = mysql.connection.cursor()
+        workoutplan_check = cur.execute(
+            'select * from workoutplan where workoutplanname = %s ', [workoutplanname]
+        )
+        if workoutplan_check > 0:
+            cur.close()
+            flash('The Work Out Plan Name is already taken! Try another one!', 'danger')
+            return render_template('trainer/workout_plans.html', user_id=user_id, form=form)
+        cur.close()
+        #SUCCESS name not taken, create plan
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT into workoutplan(workoutplanname, intensity, plandescription) '
+            'VALUES(%s,%s,%s)', (workoutplanname, intensity, plandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT * from workoutplan where workoutplanname = %s', [workoutplanname]
+        )
+        result = cur.fetchone()
+        workoutplanid = result['WorkoutPlanID']
+        cur.close()
+        flash('Work Out Plan Created!', 'success')
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
+
+
+@app.route("/trainer/<int:user_id>/<int:workoutplanid>/create_workoutplan2/", methods=['GET','POST'])
+def create_workout_plan2(user_id, workoutplanid):
+    if request.method == 'POST':
+        #Get workoutname
+        workoutname = request.form['WorkoutName']
+        workoutnamepassed = '%' + workoutname + '%'
+        cur = mysql.connection.cursor()
+        result = cur.execute(
+            'select * from workouts where workoutname like %s', [workoutnamepassed]
+        )
+        workouts = cur.fetchall()
+
+        if result > 0:
+            flash('Matches Found', 'success')
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+        else:
+            flash("No Matches Found", 'danger')
+            cur.close()
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    else:
+        #Display Workouts
+        cur = mysql.connection.cursor()
+        result = cur.execute("select * from workouts")
+        workouts = cur.fetchall()
+
+        if result > 0:
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+            #return render_template('meals.html', meals=Meals)
+        else:
+            flash('No Workouts Found Try Again!', 'danger')
+            cur.close()
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+            #return render_template('meals.html', msg=msg)
+
+
+  
+@app.route('/add_workout_to_workoutplan/<user_id>/<string:workoutplanid>/<string:workoutid>', methods=['POST'])
+def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
+    #Check if workout is in workoutplan
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        'select * from Workout_Comprise_WPlan where workoutplanid = %s and workoutid = %s', [workoutplanid, workoutid]
+    )
+    if result > 0:
+        flash("You've already added this workout!", 'danger')
+        cur.close()
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    cur.close()
+    #Workout does not exist in Workoutplan, lets add. First find workoutplan name
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from WorkoutPlan where workoutplanid = %s', [workoutplanid]
+    )
+    result = cur.fetchone()
+    workoutplanname = result['WorkoutPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT into Workout_Comprise_WPlan(WorkoutPlanID, WorkoutPlanName, WorkoutID) '
+        'VALUES(%s,%s,%s)', (workoutplanid, workoutplanname, workoutid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash("Workout has been added to your workoutplan!", 'success')
+    return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
 
 
 # Route for adding strength workouts

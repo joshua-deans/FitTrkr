@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 <!-TODO: Replace client with User name ->
-{% block title %}Your Meal Plans{% endblock %}
+{% block title %} Workout Plans{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
@@ -9,8 +9,14 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1 class="display-5" style="display: inline">Your Meal Plans</h1>
-        <button type="button" class="btn btn-primary float-right">New Workout Plan</button>
+        <h1 class="display-5" style="display: inline">Your Work Out Plans</h1>
+        <td>
+            <form action="{{url_for('create_workoutplan', user_id=user_id)}}" method="post">
+                <input type="hidden" name="_method" value="New Work Plan">
+                <input type="submit" value="New Work Out Plan" class="btn btn-success" >
+
+            </form>
+        </td>
         <br>
         <br>
         <div class="card mx-auto px-3 py-4">

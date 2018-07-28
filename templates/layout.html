@@ -21,12 +21,12 @@
         
         {% if is_logged_in_bool %}
             {% if trainer_or_client == "client" %}
-                <a class="navbar-brand" href="/client/{{current_user_id}}/">FitTrkr</a>  
+                <a class="navbar-brand" href="{{ url_for('base') }}">FitTrkr</a>
             {% else %}
-                <a class="navbar-brand" href="/trainer/{{current_user_id}}/">FitTrkr</a>  
+                <a class="navbar-brand" href="{{ url_for('base') }}">FitTrkr</a>
             {% endif %}
         {% else %}
-            <a class="navbar-brand" href="/">FitTrkr</a>  
+            <a class="navbar-brand" href="{{ url_for('base') }}">FitTrkr</a>
         {% endif %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
