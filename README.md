@@ -312,8 +312,18 @@ VALUES
     (2, 'Weight Gain/Bulk', 'Steak and Eggs', 1000, 'Ketogenic', 'Pan sear any filet of beef that you’d like. \nPan fry two eggs in butter'),
     (3, 'Weight Loss', 'Beet and Ricotta Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in arugula.'),
     (4, 'Weight Gain/Bulk', 'Braised Pork Poutine', 890, ' ', 'Slow braise pork.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
-    (5, 'Weight Loss', 'Apple Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' );
-
+    (5, 'Weight Loss', 'Apple Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' ),
+    (6, 'Weight Loss', 'Lamb and Rice', 1500, ' ', 'Pan fry a lamb breast.\n Cook basmati rice in boiling water'),
+    (7, 'Weight Gain/Bulk', 'Salmon and Eggs', 800, 'Ketogenic', 'Pan sear any filet of salmon that you’d like. \nPan fry two eggs in butter'),
+    (8, 'Weight Loss', 'Beet and Feet Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in severed feet.'),
+    (9, 'Weight Gain/Bulk', 'Braised Beef Heart Poutine', 490, ' ', 'Slow braise beef heart.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
+    (10, 'Weight Loss', 'Keep Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' ),
+    (11, 'Weight Loss', 'Johnny Pork and Rice', 700, ' ', 'Pan fry a Johnny breast.\n Cook basmati rice in boiling water'),
+    (12, 'Weight Gain/Bulk', 'Trout and Eggs', 800, 'Ketogenic', 'Pan sear any filet of salmon that you’d like. \nPan fry two eggs in butter'),
+    (13, 'Weight Loss', 'Beet and Pork Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in severed feet.'),
+    (14, 'Weight Gain/Bulk', 'Braised jonny Poutine', 490, ' ', 'Slow braise beef heart.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
+    (15, 'Weight Loss', 'Feet Salad', 700, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Feet.\nPut in bowl.\n' );
+    
 ```
 ```
 INSERT INTO MealPlan
@@ -338,7 +348,13 @@ VALUES
     (7, 'Easy', 'Get down on all fours.\nWalk by moving forward with hands then feet.', 'None', 'Crawl'),
     (8, 'Easy', 'Jump in air.\nSpread legs and arms like eagle', 'None', 'Jumping Jack'),
     (9, 'Easy', 'Jump in air.\nTuck knees in at peak', 'None', 'Knee Tucks'),
-    (10, 'Easy', 'Jump in air.\nReach up as high as you can with one hand','None', 'High Jump');
+    (10, 'Med', 'Jump in air.\nReach up as med as you can with one hand','None', 'med Jump'),
+    (11, 'Easy', 'Move legs forward briskly but not too briskly', 'None', 'Speed walking'),
+    (12, 'Med', 'Get down on all three.\nWalk by moving forward with hand then feet.', 'None', 'Baby Crawl'),
+    (13, 'Easy', 'Jump in air.\nSpread legs and arms like eagle', 'None', 'Small Jack'),
+    (14, 'Med', 'Jump in pool.\nTuck knees in at peak', 'None', 'Canon Ball'),
+    (15, 'Easy', 'Jump in air.\nReach up as low as you can with one hand','None', 'small Jump');
+    
 ```
 ```
 INSERT INTO WorkoutPlan
@@ -366,7 +382,13 @@ VALUES
     (3,'Oprah for President','Medium','Love yourself','4 weeks',7,2,2),
     (4,'The Tony workout itsss great','High','Become a fierce Tiger','10 weeks',8,5,4),
     (5,'Dragon child', 'High','Dragon Penultimate Form','10 weeks',9,3,4),
-    (6,'Rainbow 6 for chicks','High','Unicorn Final Form','15 weeks',10,5,5);
+    (6,'Rainbow 6 for chicks','High','Unicorn Final Form','15 weeks',10,5,5),
+    (7,'Killer Mikes Sweat', 'High','Damnnnnn','8 weeks',6, 1, 1),
+    (8,'Dani Storms fitness','Low','You too can be famous','9 weeks',6, 4, 1),
+    (9,'The Rock for President','Medium','Can you smell what im sweating','3 weeks',6,2,2),
+    (10,'The Grunt','High','The guy that no one wants to be at the gym','4 weeks',6,5,4),
+    (11,'Unicorn is my spirit animal', 'High','ITS SO FLUFFYYYYYY','6 weeks',6,3,4),
+    (12,'No land for wimps','High','Hard as hell','12 weeks',6,5,5);
 
 ```
 ```
