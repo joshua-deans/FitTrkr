@@ -489,6 +489,31 @@ def client(user_id):
         return redirect('/')
 
 
+# @app.route("/client/<int:user_id>/program_detail/")
+# def client_browse_plan_detail(user_id, plan_info=None):
+#     # Browse all of the fitness plans
+#     redir = ensure_user_is_logged_in_properly(user_id)
+#     if redir:
+#         return redir
+#     cur = mysql.connection.cursor()
+#     cur.execute('SELECT COUNT(*) FROM FitnessProgram')
+#     count = cur.fetchone()['COUNT(*)']
+#     cur.execute(
+#         'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
+#         'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
+#         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+#     result = cur.fetchall()
+#     cur.execute(
+#         'SELECT c.Current_FitnessProgram '
+#         'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', (user_id,))
+#     curr_fitness_program = cur.fetchone()
+#
+#     plan_info = result
+#     cur.close()
+#     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
+#                            curr_fitness_program=curr_fitness_program, count=count)
+
+
 @app.route("/client/<int:user_id>/programs/")
 def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
@@ -698,7 +723,7 @@ def trainer_plans(user_id):
             return redir
         cur = mysql.connection.cursor()
         cur.execute(
-            'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
+            'SELECT f.FitnessProgramID, u.FirstName, u.LastName, u.UserName, f.FP_intensity, f.Description, f.Program_Length, '
             'f.MealPlanID, f.WorkoutPlanID '
             'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID AND u.UserID = %s', [str(user_id)])
         result = cur.fetchall()
