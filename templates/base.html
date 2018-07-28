@@ -7,20 +7,39 @@
 {% endblock %}
 
 {% block nav_items %}
+    {% set current_user_id = is_logged_in_userid(request) %}
+    {% set trainer_or_client = get_trainer_or_client(current_user_id)%}
     {% if is_logged_in_bool(request) %}
-        <li class="nav-item">
-            <a class="nav-link" href="/login">Dashboard</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/login">Program</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/login">Meal Plans</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/login">Workout Plans</a>
-        </li>
-        <!-- <li class="nav-item">Logged in!</li> -->
+        {% if trainer_or_client == "client" %} 
+            <li class="nav-item">
+                <a class="nav-link" href="/client/{{current_user_id}}/">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/client/{{current_user_id}}/logs">Logs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/client/{{current_user_id}}/programs">Program</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/client/{{current_user_id}}/meal_plans">Meal Plans</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/client/{{current_user_id}}/workout_plans">Workout Plans</a>
+            </li>
+        {% else  %}
+            <li class="nav-item">
+                <a class="nav-link" href="/trainer/{{current_user_id}}/">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/trainer/{{current_user_id}}/all_programs">Program</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/trainer/{{current_user_id}}/meal_plans">Meal Plans</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/trainer/{{current_user_id}}/workout_plans">Workout Plans</a>
+            </li>
+        {% endif %}
     {% else %}
         <!-- <li class="nav-item">Logged out!</li> -->
         <li class="nav-item">

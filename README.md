@@ -127,7 +127,7 @@ CREATE TABLE MealPlan_Meal
 CREATE TABLE Workout_Comprise_WPlan
 	(
 	WorkoutPlanID INT(11),
-	WorkoutPlanName VARCHAR(50) UNIQUE,
+	WorkoutPlanName VARCHAR(50) ,
 	WorkOutID INT(11),
 	NumSets INT(11),
 	NumReps INT(11),
