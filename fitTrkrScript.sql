@@ -236,7 +236,7 @@ VALUES
 
 INSERT INTO Users(username, firstname, lastname, passwordhash, gender, age, address, postalcode)
 VALUES
-       ('dp','David','Pham','ae3722f56fde9c87','Male',30,'1330 Schuyler Dr','90210'),
+    ('dp','David','Pham','ae3722f56fde9c87','Male',30,'1330 Schuyler Dr','90210'),
     ('wc','Winfield','Chen','0274cce43ec14814','Male',22,'1600 Pennsylvania Av','V3K1C8'),
     ('gh','Giovanni','HoSang','33afa37d1f677f81','Male',35,'2 Example St','12345'),
     ('jd','Joshua','Deans','5b0ec797486d5091','Female',19,'302 Hastings St','C1E1H0'),
@@ -335,8 +335,17 @@ VALUES
     (1,'Green is Clean',3,'lunch/dinner' ),
     (1,'Green is great',5,'breakfast'),
     (2,'Delishhh!',3, 'lunch/dinner'),
-    (2,'Yummmmmm',1,'lunch/dinner'),
-    (2,'Yum in your tum!',4,'lunch/dinner');
+    (2,'Delishhh!',1,'lunch/dinner'),
+    (2,'Delishhh!!',4,'lunch/dinner'),
+    (1,'Green is Clean',7,'lunch/dinner' ),
+    (1,'Green is Clean',8,'breakfast/dinner' ),
+    (1,'Green is Clean',9,'breakfast/lunch' ),
+    (1,'Green is Clean',10,'breakfast/dinner' ),
+    (1,'Green is Clean',11,'lunch/dinner' ),
+    (1,'Green is Clean',12,'lunch/dinner' ),
+    (2,'Delishhh!',6, 'lunch/dinner'),
+    (2,'Delishhh!',7,'lunch/dinner'),
+    (2,'Delishhh!',5,'lunch/dinner');
 
 INSERT INTO Preq_Fitness
 VALUES
