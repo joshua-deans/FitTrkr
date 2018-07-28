@@ -49,30 +49,32 @@
                 <h2 class="display-5" style="display: inline">{{ program_details['FitnessProgramName'] }}</h2>
                 <p class="lead">{{ program_details['Description'] }}</p>
                 <p>Program length: {{ program_details['Program_Length'] }}</p>
+                <p>Number of Clients: {{ client_count['COUNT(c.UserID)'] }}</p>
             </div>
         </div>
         <br>
         <br>
         <div class="card mx-auto px-3 py-4">
-            {% if meal_plan_info %}
+            {% if client_details %}
+                <h2>Client Info</h2>
                 <table class="table table-striped table-hover table-responsive-md">
                     <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Dietary Restrictions</th>
-                        <th scope="col">Meal Plan Description</th>
-                        <th scope="col">Used in Fitness Program:</th>
+                        <th scope="col">User Name</th>
+                        <th scope="col">Age</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Logs Completed:</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for item in meal_plan_info %}
+                    {% for item in client_details %}
                         <tr>
-                            <th scope="row">{{ item['MealPlanID'] }}</th>
-                            <td>{{ item['Category'] }}</td>
-                            <td>{{ item['DietaryRestrictions'] }}</td>
-                            <td>{{ item['MealPlanDescription'] }}</td>
-                            <td>{{ item['FitnessProgramID'] }}</td>
+                            <th scope="row">{{ item['UserID'] }}</th>
+                            <td>{{ item['UserName'] }}</td>
+                            <td>{{ item['Age'] }}</td>
+                            <td>{{ item['Gender'] }}</td>
+                            <td>{{ item['COUNT(l.LogID)'] }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

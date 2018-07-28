@@ -81,6 +81,7 @@ def get_trainer_or_client(user_id):
     elif trainer_check > 0:
         return 'trainer'
 
+
 # Route for landing page
 @app.route("/")
 def base():
@@ -460,12 +461,12 @@ def delete_log(logid):
     # Create Cursor
     cur = mysql.connection.cursor()
     # Store userid
-    user_id = cur.execute("select userid FROM logs where logid=%s", [str(logid)])
+    user_id = cur.execute("select userid FROM Logs where logid=%s", [str(logid)])
     result = cur.fetchone()
     cur.close()
     # Delete Log
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM logs where logid= %s", [str(logid)])
+    cur.execute("DELETE FROM Logs where logid= %s", [str(logid)])
 
     mysql.connection.commit()
     cur.close()
@@ -560,12 +561,24 @@ def trainer_plan_detail(user_id, program_id):
         'FROM FitnessProgram f WHERE f.FitnessProgramID = %s ', (program_id,))
     program_details = cur.fetchone()
     cur.execute(
-        'SELECT f.FitnessProgramName, f.Description, f.Program_Length '
-        'FROM FitnessProgram f, Clients c, Users u, Log l '
-        'WHERE f.FitnessProgramID = %s ', (program_id,))
-    client_details = cur.fetchone()
+        'SELECT COUNT(c.UserID) '
+        'FROM FitnessProgram f, Clients c WHERE f.FitnessProgramID = %s '
+        'AND f.FitnessProgramID = c.Current_FitnessProgram', (program_id,))
+    client_count = cur.fetchone()
+    cur.execute(
+        'SELECT c.UserID, u.UserName, COUNT(l.LogID), u.Gender, u.Age '
+        'FROM FitnessProgram f, Clients c, Logs l, Users u '
+        'WHERE f.FitnessProgramID = %s AND f.FitnessProgramID = c.Current_FitnessProgram AND '
+        'c.UserID = u.UserID AND l.UserID = c.UserID AND l.FitnessProgramID = f.FitnessProgramID '
+        'GROUP BY c.UserID '
+        'ORDER BY COUNT(l.LogID)',
+        (program_id,))
+    client_details = cur.fetchall()
+    print(client_details)
     cur.close()
-    return render_template('trainer/plan_details.html', user_id=user_id, program_details=program_details)
+    return render_template('trainer/plan_details.html', user_id=user_id, program_details=program_details,
+                           client_details=client_details, client_count=client_count)
+
 
 @app.route("/trainer/<int:user_id>/meal_plans/")
 def trainer_meal_plans(user_id):
@@ -576,7 +589,6 @@ def trainer_meal_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, MealPlan m, Users u WHERE f.TrainerID = u.UserID AND '
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', str(user_id))
     result = cur.fetchall()
-    print(result)
     if result:
         plan_info = result
     cur.close()
@@ -631,7 +643,6 @@ def workouts():
         else:
             msg = "No workouts Found"
             return render_template('workouts.html', msg=msg)
-
 
 
 # Route for adding strength workouts
@@ -696,7 +707,6 @@ def workout(workoutID):
         return render_template('workouts.html', msg=msg)
 
 
-
 # Route for meals
 @app.route("/meals/", methods=['GET', 'POST'])
 def meals():
@@ -732,7 +742,6 @@ def meals():
             return render_template('meals.html', msg=msg)
 
 
-
 # Route for adding meals
 @app.route("/add_meal", methods=['POST'])
 def add_meal():
@@ -766,7 +775,6 @@ def meal(mealID):
     else:
         msg = "No meals Found"
         return render_template('meals.html', msg=msg)
-
 
 
 # Route for trainers
@@ -807,7 +815,6 @@ def trainers_search():
             return render_template('trainers.html', msg=msg)
 
 
-
 # Route for single trainer
 @app.route("/trainer_search/<string:UserID>/")
 def trainer_search(UserID):
@@ -824,7 +831,6 @@ def trainer_search(UserID):
     else:
         msg = "No trainers Found"
         return render_template('trainers.html', msg=msg)
-
 
 
 # Note: This is in debug mode. This means that it restarts with changes
