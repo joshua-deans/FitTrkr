@@ -705,8 +705,41 @@ def create_workout_plan2(user_id, workoutplanid):
         
             
     return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
-        
 
+  
+@app.route('/add_workout_to_workoutplan/<user_id>/<string:workoutplanid>/<string:workoutid>', methods=['POST'])
+def add_meal_2_mealplan(user_id,workoutplanid,workoutid):
+
+    return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+
+@app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
+def add_meal_2_mealplan(user_id,mealplanid,mealid):
+    #check if meal in mealplan
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        'select * from MealPlan_Meal where mealplanid = %s AND mealid = %s',(mealplanid,mealid)
+    )
+    if result > 0:
+        flash("You already added this meal", 'danger')
+        cur.close()
+        return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+    cur.close()
+    #Let's add meal to mealplan
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from MealPlan where mealplanid = %s', [mealplanid]
+    )
+    result = cur.fetchone()
+    mealplanname = result['MealPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT INTO MealPlan_Meal(MealPlanID,MealPlanName,MealID) VALUES(%s,%s,%s)',(mealplanid, mealplanname,mealid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash('Meal added to your MealPlan', 'success')
+    return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
 @app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
 def create_mealplan2(user_id, mealplanid):
     if request.method == 'POST':
