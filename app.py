@@ -833,6 +833,127 @@ def workouts():
             return render_template('workouts.html', msg=msg)
 
 
+class WorkOutPlanForm(Form):
+    workoutplanname = StringField('workoutplanname', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)])
+    intensity = StringField('intensity', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    plandescription = StringField('plandescription', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=400)])  
+
+@app.route("/trainer/<int:user_id>/create_workoutplan/", methods=['GET','POST'])
+def create_workoutplan(user_id):
+    form = WorkOutPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #FORM FIELDS
+        workoutplanname = form.workoutplanname.data
+        intensity = form.intensity.data
+        plandescription = form.plandescription.data
+        #Check to see if workoutplan already exists 
+        cur = mysql.connection.cursor()
+        workoutplan_check = cur.execute(
+            'select * from workoutplan where workoutplanname = %s ', [workoutplanname]
+        )
+        if workoutplan_check > 0:
+            cur.close()
+            flash('The Work Out Plan Name is already taken! Try another one!', 'danger')
+            return render_template('trainer/workout_plans.html', user_id=user_id, form=form)
+        cur.close()
+        #SUCCESS name not taken, create plan
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT into workoutplan(workoutplanname, intensity, plandescription) '
+            'VALUES(%s,%s,%s)', (workoutplanname, intensity, plandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT * from workoutplan where workoutplanname = %s', [workoutplanname]
+        )
+        result = cur.fetchone()
+        workoutplanid = result['WorkoutPlanID']
+        cur.close()
+        flash('Work Out Plan Created!', 'success')
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
+
+
+@app.route("/trainer/<int:user_id>/<int:workoutplanid>/create_workoutplan2/", methods=['GET','POST'])
+def create_workout_plan2(user_id, workoutplanid):
+    if request.method == 'POST':
+        #Get workoutname
+        workoutname = request.form['WorkoutName']
+        workoutnamepassed = '%' + workoutname + '%'
+        cur = mysql.connection.cursor()
+        result = cur.execute(
+            'select * from workouts where workoutname like %s', [workoutnamepassed]
+        )
+        workouts = cur.fetchall()
+
+        if result > 0:
+            flash('Matches Found', 'success')
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+        else:
+            flash("No Matches Found", 'danger')
+            cur.close()
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+        return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
+    else:
+        #Display Workouts
+        cur = mysql.connection.cursor()
+        result = cur.execute("select * from workouts")
+        workouts = cur.fetchall()
+
+        if result > 0:
+            cur.close()
+            return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
+            #return render_template('meals.html', meals=Meals)
+        else:
+            flash('No Workouts Found Try Again!', 'danger')
+            cur.close()
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+            #return render_template('meals.html', msg=msg)
+        
+            
+    return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
+
+  
+@app.route('/add_workout_to_workoutplan/<user_id>/<string:workoutplanid>/<string:workoutid>', methods=['POST'])
+def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
+    #Check if workout is in workoutplan
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        'select * from Workout_Comprise_WPlan where workoutplanid = %s and workoutid = %s', [workoutplanid, workoutid]
+    )
+    if result > 0:
+        flash("You've already added this workout!", 'danger')
+        cur.close()
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    cur.close()
+    #Workout does not exist in Workoutplan, lets add. First find workoutplan name
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from WorkoutPlan where workoutplanid = %s', [workoutplanid]
+    )
+    result = cur.fetchone()
+    workoutplanname = result['WorkoutPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT into Workout_Comprise_WPlan(WorkoutPlanID, WorkoutPlanName, WorkoutID) '
+        'VALUES(%s,%s,%s)', (workoutplanid, workoutplanname, workoutid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash("Workout has been added to your workoutplan!", 'success')
+    return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+
+
 # Route for adding strength workouts
 @app.route("/add_strength_workout", methods=['POST'])
 def add_strength_workout():
