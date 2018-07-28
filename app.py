@@ -531,7 +531,7 @@ def client_browse_plans(user_id, plan_info=None):
     cur.execute('SELECT COUNT(*) FROM FitnessProgram')
     count = cur.fetchone()['COUNT(*)']
     cur.execute(
-        'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
+        'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, u.UserName, f.FP_intensity, f.Description, '
         'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
@@ -544,6 +544,53 @@ def client_browse_plans(user_id, plan_info=None):
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
                            curr_fitness_program=curr_fitness_program, count=count)
+
+
+@app.route("/client/<int:user_id>/current_program/")
+def client_current_plan(user_id):
+    # Browse all of the fitness plans
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT f.FitnessProgramID FROM Clients c, FitnessProgram f '
+                'WHERE c.UserID = %s AND c.Current_FitnessProgram = f.FitnessProgramID', (user_id,))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return redirect(url_for('client_plan_details', user_id=user_id, program_id=result['FitnessProgramID']))
+    else:
+        return redirect(url_for('base'))
+
+
+@app.route("/client/<int:user_id>/program/<int:program_id>")
+def client_plan_details(user_id, program_id):
+    redir = ensure_user_is_logged_in_properly(user_id)
+    if redir:
+        return redir
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramName, f.FP_intensity, f.Description, f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
+        'FROM FitnessProgram f WHERE f.FitnessProgramID = %s', (program_id,))
+    result = cur.fetchone()
+    workout_plan_id = result['WorkoutPlanID']
+    meal_plan_id = result['MealPlanID']
+    cur.execute('SELECT DISTINCT m.MealName, m.MealType, m.MealDescription '
+                'FROM MealPlan_Meal mpm, Meals m WHERE mpm.MealPlanID = %s AND m.MealID IN '
+                '(SELECT mpm2.MealID FROM MealPlan_Meal mpm2 WHERE mpm2.MealPlanID = %s)',
+                (meal_plan_id, meal_plan_id))
+    meal_plan_data = cur.fetchall()
+    print(meal_plan_data)
+    cur.execute('SELECT w.WorkoutName, w.Equipment, w.Intensity '
+                'FROM Workout_Comprise_WPlan wcw, Workouts w WHERE wcw.WorkoutPlanID = %s AND w.WorkoutID IN '
+                '(SELECT wcw2.WorkoutID FROM Workout_Comprise_WPlan wcw2 WHERE wcw2.WorkoutPlanID = %s)',
+                (workout_plan_id, workout_plan_id))
+    workout_plan_data = cur.fetchall()
+    print(workout_plan_data)
+    cur.close()
+    return render_template('client/program_details.html', fitness_program_details=result, meal_plan_data=meal_plan_data,
+                           workout_plan_data=workout_plan_data)
+
 
 
 @app.route("/client/<int:user_id>/change_program/<program_id>", methods=['POST'])

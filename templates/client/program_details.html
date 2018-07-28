@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card mx-auto px-3 py-4">
+            <div class="container">
+                <h2 class="display-5">{{ fitness_program_details['FitnessProgramName'] }}</h2>
+                {#                <p class="lead">Trainer: <b></b></p>#}
+                <p>Description: {{ fitness_program_details['Description'] }}</p>
+                <p>Intensity: {{ fitness_program_details['FP_intensity'] }}</p>
+                <p>Program Length: {{ fitness_program_details['Program_Length'] }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header"><b>Meal Plan</b></div>
+                    <ul class="list-group list-group-flush">
+                        {% if meal_plan_data %}
+                            {% for item in meal_plan_data %}
+                                <li class="list-group-item">{{ item['MealName'] }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">There are no meals in this plan</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <br>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header"><b>Workout Plan</b></div>
+                    <ul class="list-group list-group-flush">
+                        {% if workout_plan_data %}
+                            {% for item in workout_plan_data %}
+                                <li class="list-group-item">{{ item['WorkoutName'] }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">There are no workouts in this plan</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <br>
+            </div>
+            <br>
+        </div>
+    </div>
+{% endblock %}
