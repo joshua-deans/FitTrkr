@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 <!-TODO: Replace client with User name ->
 {% block title %}Dashboard{% endblock %}
@@ -29,11 +29,8 @@
 
     <li class="nav-item dropdown">
         <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
-        <span class="caret"></span></a>
+        <span class="caret"></span>
         <ul class="dropdown-menu dropdown-menu-right">
-            <!-- Search all meals by Workout name, meal name, trainer
-            As you click each you see all the pages, then on the page
-            itself there is a search box that would run the query-->
             <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
             <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
             <li><a class="dropdown-item" href="/meals">Meals</a></li>
@@ -63,6 +60,7 @@
                         <th scope="col">Program Duration</th>
                         <th scope="col">Meal Plan</th>
                         <th scope="col">Workout Plan</th>
+                        <th scope="col"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -75,6 +73,11 @@
                             <td>{{ item['Program_Length'] }}</td>
                             <td>{{ item['MealPlanID'] }}</td>
                             <td>{{ item['WorkoutPlanID'] }}</td>
+                            <th scope="row">
+                                <a href="/trainer/{{ user_id }}/programs/{{ item['FitnessProgramID'] }}">
+                                    <button class="btn btn-primary btn-sm">Details</button>
+                                </a>
+                            </th>
                         </tr>
                     {% endfor %}
                     </tbody>
