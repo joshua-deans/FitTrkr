@@ -44,7 +44,13 @@
                     </div>
                     <button class="btn btn-primary">Submit</button>
                 </form>
+                {% if client %}
+                    <form method="post" action="/delete/{{ user_id }}">
+                        <button class="btn btn-danger float-right">Delete Account</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
+    <br>
 {% endblock %}
