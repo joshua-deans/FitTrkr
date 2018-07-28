@@ -670,7 +670,7 @@ def create_workoutplan(user_id):
 @app.route("/trainer/<int:user_id>/<int:workoutplanid>/create_workoutplan2/", methods=['GET','POST'])
 def create_workout_plan2(user_id, workoutplanid):
 
-        return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
+        return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
 
 @app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
 def create_mealplan2(user_id, mealplanid):
