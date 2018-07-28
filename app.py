@@ -64,7 +64,7 @@ def is_logged_in_userid(flask_request: Flask.request_class) -> int:
             (token,))
         result = cur.fetchone()
         if result is None:
-            return False, -1
+            return -1
         if 'UserID' in result:
             return result['UserID']
     return -1
