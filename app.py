@@ -708,9 +708,34 @@ def create_workout_plan2(user_id, workoutplanid):
 
   
 @app.route('/add_workout_to_workoutplan/<user_id>/<string:workoutplanid>/<string:workoutid>', methods=['POST'])
-def add_meal_2_mealplan(user_id,workoutplanid,workoutid):
-
-    return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
+    #Check if workout is in workoutplan
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        'select * from Workout_Comprise_WPlan where workoutplanid = %s and workoutid = %s', [workoutplanid, workoutid]
+    )
+    if result > 0:
+        flash("You've already added this workout!", 'danger')
+        cur.close()
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    cur.close()
+    #Workout does not exist in Workoutplan, lets add. First find workoutplan name
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'select * from WorkoutPlan where workoutplanid = %s', [workoutplanid]
+    )
+    result = cur.fetchone()
+    workoutplanname = result['WorkoutPlanName']
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'INSERT into Workout_Comprise_WPlan(WorkoutPlanID, WorkoutPlanName, WorkoutID) '
+        'VALUES(%s,%s,%s)', (workoutplanid, workoutplanname, workoutid)
+    )
+    mysql.connection.commit()
+    cur.close()
+    flash("Workout has been added to your workoutplan!", 'success')
+    return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
 
 @app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
 def add_meal_2_mealplan(user_id,mealplanid,mealid):
