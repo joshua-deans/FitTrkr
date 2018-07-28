@@ -416,7 +416,7 @@ VALUES
     (1,'Green is Clean',11,'lunch/dinner' ),
     (1,'Green is Clean',12,'lunch/dinner' ),
     (2,'Delishhh!',6, 'lunch/dinner'),
-    (2,'Delishhh!',1,'lunch/dinner'),
+    (2,'Delishhh!',7,'lunch/dinner'),
     (2,'Delishhh!',5,'lunch/dinner');
 
 
