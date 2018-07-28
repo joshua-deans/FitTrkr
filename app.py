@@ -32,6 +32,8 @@ def is_logged_in(flask_request: Flask.request_class) -> (bool, int):
             'SELECT UserID FROM Session WHERE Token = %s',
             (token,))
         result = cur.fetchone()
+        if result is None:
+            return False, -1
         if 'UserID' in result:
             return True, result['UserID']
     return False, -1
@@ -46,6 +48,8 @@ def is_logged_in_bool(flask_request: Flask.request_class) -> bool:
             'SELECT UserID FROM Session WHERE Token = %s',
             (token,))
         result = cur.fetchone()
+        if result is None:
+            return False
         if 'UserID' in result:
             return True
     return False
@@ -367,6 +371,8 @@ def client(user_id):
 def client_browse_plans(user_id, plan_info=None):
     # Browse all of the fitness plans
     cur = mysql.connection.cursor()
+    cur.execute('SELECT COUNT(*) FROM FitnessProgram')
+    count = cur.fetchone()['COUNT(*)']
     cur.execute(
         'SELECT f.FitnessProgramID, f.FitnessProgramName, u.FirstName, u.LastName, f.FP_intensity, f.Description, '
         'f.Program_Length, f.MealPlanID, f.WorkoutPlanID '
@@ -380,7 +386,7 @@ def client_browse_plans(user_id, plan_info=None):
         plan_info = result
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
-                           curr_fitness_program=curr_fitness_program)
+                           curr_fitness_program=curr_fitness_program, count=count)
 
 
 @app.route("/client/<int:user_id>/change_program/<program_id>", methods=['POST'])
@@ -414,7 +420,7 @@ def client_logs(user_id, log_info=None):
     if result:
         log_info = result
     cur.execute("SELECT c.Current_FitnessProgram FROM Clients c WHERE c.UserID = %s", (user_id,))
-    current_fitness_program = cur.fetchone();
+    current_fitness_program = cur.fetchone()
     cur.close()
     if request.method == 'POST':
         log_date = request.form.get('log-date')
@@ -485,9 +491,11 @@ def trainer(user_id):
 
 
 @app.route("/trainer/<int:user_id>/all_programs/")
-def trainer_all_plans(user_id):
+def trainer_all_plans(user_id, plan_info=None):
     # All fitness plans made by all of the trainers
     cur = mysql.connection.cursor()
+    cur.execute('SELECT COUNT(*) FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
+    count = cur.fetchone()['COUNT(*)']
     cur.execute(
         'SELECT f.FitnessProgramID, u.FirstName, u.LastName, f.FP_intensity, f.Description, f.Program_Length, '
         'f.MealPlanID, f.WorkoutPlanID '
@@ -496,7 +504,7 @@ def trainer_all_plans(user_id):
     if result:
         plan_info = result
     cur.close()
-    return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id)
+    return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id, count=count)
 
 
 @app.route("/trainer/<int:user_id>/programs/", methods=['GET', 'POST'])
@@ -598,29 +606,32 @@ def workouts():
         WorkoutName = request.form['WorkoutName']
         WorkoutNamePassed = '%' + WorkoutName + '%'
         cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Workouts WHERE WorkoutName LIKE %s ', [WorkoutNamePassed])
+        count = cur.fetchone()['COUNT(*)']
         result = cur.execute("SELECT * FROM Workouts WHERE WorkoutName LIKE %s ", [WorkoutNamePassed])
         Workouts = cur.fetchall()
-
-        if result > 0:
-            return render_template('workouts.html', workouts=Workouts)
-        else:
-            msg = "No meals Found"
-            return render_template('workouts.html', msg=msg)
         cur.close()
 
-    else:
-        cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM Workouts")
-        Workouts = cur.fetchall()
-
         if result > 0:
-            return render_template('workouts.html', workouts=Workouts)
+            return render_template('workouts.html', workouts=Workouts, count=count)
         else:
             msg = "No workouts Found"
             return render_template('workouts.html', msg=msg)
+
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Workouts')
+        count = cur.fetchone()['COUNT(*)']
+        result = cur.execute("SELECT * FROM Workouts")
+        Workouts = cur.fetchall()
         cur.close()
 
-    return render_template('workouts.html', workouts=Workouts)
+        if result > 0:
+            return render_template('workouts.html', workouts=Workouts, count=count)
+        else:
+            msg = "No workouts Found"
+            return render_template('workouts.html', msg=msg)
+
 
 
 # Route for adding strength workouts
@@ -675,7 +686,7 @@ def add_cardio_workout():
 @app.route("/workout/<string:workoutID>/")
 def workout(workoutID):
     cur = mysql.connection.cursor()
-    result = cur.execute("SELECT * FROM Workouts WHERE WorkoutID = %s", (workoutID))
+    result = cur.execute("SELECT * FROM Workouts WHERE WorkoutID = %s", (workoutID,))
     Workout = cur.fetchone()
     cur.close()
     if result > 0:
@@ -684,7 +695,6 @@ def workout(workoutID):
         msg = "No workouts Found"
         return render_template('workouts.html', msg=msg)
 
-    return render_template('workouts.html', workouts=Workout)
 
 
 # Route for meals
@@ -695,29 +705,32 @@ def meals():
         MealName = request.form['MealName']
         MealNamePassed = '%' + MealName + '%'
         cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Meals WHERE MealName LIKE %s ', [MealNamePassed])
+        count = cur.fetchone()['COUNT(*)']
         result = cur.execute("SELECT * FROM Meals WHERE MealName LIKE %s ", [MealNamePassed])
         Meals = cur.fetchall()
+        cur.close()
 
         if result > 0:
-            return render_template('meals.html', meals=Meals)
+            return render_template('meals.html', meals=Meals, count=count)
         else:
             msg = "No meals Found"
             return render_template('meals.html', msg=msg)
-        cur.close()
 
     else:
         cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Meals')
+        count = cur.fetchone()['COUNT(*)']
         result = cur.execute("SELECT * FROM Meals")
         Meals = cur.fetchall()
+        cur.close()
 
         if result > 0:
-            return render_template('meals.html', meals=Meals)
+            return render_template('meals.html', meals=Meals, count=count)
         else:
             msg = "No meals Found"
             return render_template('meals.html', msg=msg)
-        cur.close()
 
-    return render_template('meals.html', meals=Meals)
 
 
 # Route for adding meals
@@ -745,16 +758,15 @@ def add_meal():
 def meal(mealID):
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM Meals WHERE MealID = %s", (mealID,))
-    Meal = cur.fetchone()
+    ret_meal = cur.fetchone()
+    cur.close()
 
     if result > 0:
-        return render_template('meal.html', meal=Meal)
+        return render_template('meal.html', meal=ret_meal)
     else:
         msg = "No meals Found"
         return render_template('meals.html', msg=msg)
-    cur.close()
 
-    return render_template('meals.html', meals=Meal)
 
 
 # Route for trainers
@@ -765,31 +777,35 @@ def trainers_search():
         TrainerUserName = request.form['UserName']
         TrainerUserNamePassed = '%' + TrainerUserName + '%'
         cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s ',
+                    [TrainerUserNamePassed])
+        count = cur.fetchone()['COUNT(*)']
         result = cur.execute("SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID AND u.UserName LIKE %s ",
                              [TrainerUserNamePassed])
         Trainers = cur.fetchall()
 
+        cur.close()
         if result > 0:
-            return render_template('trainers.html', trainers=Trainers)
+            return render_template('trainers.html', trainers=Trainers, count=count)
         else:
             msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
-        cur.close()
 
     else:
         cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(*) FROM Users u, Trainers t WHERE u.UserID = t.UserID')
+        count = cur.fetchone()['COUNT(*)']
         result = cur.execute(
             'SELECT * FROM Users u, Trainers t WHERE u.UserID = t.UserID')
         Trainers = cur.fetchall()
+        cur.close()
 
         if result > 0:
-            return render_template('trainers.html', trainers=Trainers)
+            return render_template('trainers.html', trainers=Trainers, count=count)
         else:
             msg = "No trainers Found"
             return render_template('trainers.html', msg=msg)
-        cur.close()
 
-    return render_template('trainers.html', trainers=Trainers)
 
 
 # Route for single trainer
@@ -801,15 +817,14 @@ def trainer_search(UserID):
                          'FROM Trainers AS t INNER JOIN Users AS u ON u.UserID = t.UserID WHERE u.UserID = %s AND t.UserID=%s',
                          (UserID, UserID))
     Trainer = cur.fetchone()
+    cur.close()
 
     if result > 0:
         return render_template('trainer.html', trainer=Trainer)
     else:
         msg = "No trainers Found"
         return render_template('trainers.html', msg=msg)
-    cur.close()
 
-    return render_template('trainers.html', trainers=Trainer)
 
 
 # Note: This is in debug mode. This means that it restarts with changes
