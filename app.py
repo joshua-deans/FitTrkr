@@ -211,14 +211,31 @@ def settings():
         user_id = is_logged_in(request)[1]
         if request.method == 'POST' and form.validate():
             cur = mysql.connection.cursor()
-            cur.execute(
-                'REPLACE INTO PostalCode(PostalCode, City, ProvinceState, Country) '
-                'VALUES (%s, %s, %s, %s)',
-                (form.postal_code.data,
-                 form.city.data,
-                 form.province_state.data,
-                 form.country.data)
+            num_entries = cur.execute(
+                'SELECT * '
+                'FROM PostalCode '
+                'WHERE PostalCode = %s',
+                (form.postal_code.data,)
             )
+            if num_entries > 0:
+                cur.execute(
+                    'UPDATE PostalCode '
+                    'SET City = %s, ProvinceState = %s, Country = %s '
+                    'WHERE PostalCode = %s',
+                    (form.city.data,
+                     form.province_state.data,
+                     form.country.data,
+                     form.postal_code.data)
+                )
+            else:
+                cur.execute(
+                    'INSERT INTO PostalCode(PostalCode, City, ProvinceState, Country) '
+                    'VALUES (%s, %s, %s, %s)',
+                    (form.postal_code.data,
+                     form.city.data,
+                     form.province_state.data,
+                     form.country.data)
+                )
             mysql.connection.commit()
             cur.execute(
                 'UPDATE Users '
