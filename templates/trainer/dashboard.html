@@ -29,7 +29,7 @@
 
     <li class="nav-item dropdown">
         <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
-        <span class="caret"></span></a>
+        <span class="caret"></span>
         <ul class="dropdown-menu dropdown-menu-right">
             <!-- Search all meals by Workout name, meal name, trainer
             As you click each you see all the pages, then on the page
@@ -46,13 +46,28 @@
     <div class="container">
         <div class="card mx-auto px-3 py-4">
             <div class="container">
-                <!-TODO: Replace John Doe with User name ->
                 <h2 class="display-5">{{ user.FirstName }} {{ user.LastName }}</h2>
-                <!-TODO: Replace John Doe with User name ->
                 <p class="lead">Trainer</p>
             </div>
         </div>
         <br>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header"><b>Your Superstars</b></div>
+                    <ul class="list-group list-group-flush">
+                        {% if superstars %}
+                            {% for client in superstars %}
+                                <li class="list-group-item">{{ client }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">No Superstars!</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <br>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-4">
                 <div class="card">

@@ -483,6 +483,8 @@ def trainer(user_id):
         'SELECT * '
         'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', (user_id,))
     result = cur.fetchone()
+    # Division query: Find all clients who are taking all of the trainer's programs (Superstars)
+
     cur.close()
     if result:
         return render_template('trainer/dashboard.html', user=result, user_id=user_id)
