@@ -64,7 +64,7 @@ def is_logged_in_userid(flask_request: Flask.request_class) -> int:
             (token,))
         result = cur.fetchone()
         if result is None:
-            return False, -1
+            return -1
         if 'UserID' in result:
             return result['UserID']
     return -1
@@ -85,10 +85,10 @@ def verify_proper_user(logged_in_as, user_id):
 def get_trainer_or_client(user_id):
     cur = mysql.connect.cursor()
     client_check = cur.execute(
-        'SELECT * from Clients WHERE UserId = %s', [user_id, ]
+        'SELECT * from Clients WHERE UserId = %s', [user_id]
     )
     trainer_check = cur.execute(
-        'SELECT * from Trainers WHERE UserId = %s', [user_id, ]
+        'SELECT * from Trainers WHERE UserId = %s', [user_id]
     )
     cur.close()
     if client_check > 0:
@@ -134,7 +134,7 @@ def signup():
         # Checks to see if username already exists
         cur = mysql.connect.cursor()
         username_check = cur.execute(
-            'SELECT * from Users WHERE UserName = %s', [username, ]
+            'SELECT * from Users WHERE UserName = %s', [username]
         )
         cur.close()
         if username_check > 0 or (not client_trainer_option):
