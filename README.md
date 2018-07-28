@@ -383,12 +383,12 @@ VALUES
     (4,'The Tony workout itsss great','High','Become a fierce Tiger','10 weeks',8,5,4),
     (5,'Dragon child', 'High','Dragon Penultimate Form','10 weeks',9,3,4),
     (6,'Rainbow 6 for chicks','High','Unicorn Final Form','15 weeks',10,5,5),
-    (7,'Killer Mikes Sweat', 'High','Damnnnnn','8 weeks',6, 1, 1),
-    (8,'Dani Storms fitness','Low','You too can be famous','9 weeks',6, 4, 1),
-    (9,'The Rock for President','Medium','Can you smell what im sweating','3 weeks',6,2,2),
-    (10,'The Grunt','High','The guy that no one wants to be at the gym','4 weeks',6,5,4),
-    (11,'Unicorn is my spirit animal', 'High','ITS SO FLUFFYYYYYY','6 weeks',6,3,4),
-    (12,'No land for wimps','High','Hard as hell','12 weeks',6,5,5);
+    (7,'Killer Mikes Sweat', 'High','Damnnnnn','8 weeks',11, 1, 1),
+    (8,'Dani Storms fitness','Low','You too can be famous','9 weeks',11, 4, 1),
+    (9,'The Rock for President','Medium','Can you smell what im sweating','3 weeks',11,2,2),
+    (10,'The Grunt','High','The guy that no one wants to be at the gym','4 weeks',11,5,4),
+    (11,'Unicorn is my spirit animal', 'High','ITS SO FLUFFYYYYYY','6 weeks',11,3,4),
+    (12,'No land for wimps','High','Hard as hell','12 weeks',11,5,5);
 
 ```
 ```
