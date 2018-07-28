@@ -7,6 +7,38 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
 {% endblock %}
 
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer', user_id=user_id) }}">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('trainer_plans', user_id=user_id) }}">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_meal_plans', user_id=user_id) }}">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_workout_plans', user_id=user_id) }}">Workout Plan</a>
+    </li>
+{% endblock %}
+
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
 {% block body %}
     <div class="container-fluid">
         <h1 class="display-5" style="display: inline">Fitness Plans</h1>
@@ -28,6 +60,7 @@
                         <th scope="col">Program Duration</th>
                         <th scope="col">Meal Plan</th>
                         <th scope="col">Workout Plan</th>
+                        <th scope="col"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -40,6 +73,11 @@
                             <td>{{ item['Program_Length'] }}</td>
                             <td>{{ item['MealPlanID'] }}</td>
                             <td>{{ item['WorkoutPlanID'] }}</td>
+                            <th scope="row">
+                                <a href="/trainer/{{ user_id }}/programs/{{ item['FitnessProgramID'] }}">
+                                    <button class="btn btn-primary btn-sm">Details</button>
+                                </a>
+                            </th>
                         </tr>
                     {% endfor %}
                     </tbody>

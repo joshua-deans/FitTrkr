@@ -400,7 +400,7 @@ def client_browse_plans(user_id, plan_info=None):
         'SELECT c.Current_FitnessProgram '
         'FROM Clients c, Users u WHERE c.UserID = u.UserID AND u.UserID = %s', (user_id,))
     curr_fitness_program = cur.fetchone()
-    
+
     plan_info = result
     cur.close()
     return render_template('client/browse_plans.html', plan_info=plan_info, user_id=user_id,
@@ -478,12 +478,12 @@ def delete_log(logid):
     # Create Cursor
     cur = mysql.connection.cursor()
     # Store userid
-    user_id = cur.execute("select userid FROM logs where logid=%s", [str(logid)])
+    user_id = cur.execute("select userid FROM Logs where logid=%s", [str(logid)])
     result = cur.fetchone()
     cur.close()
     # Delete Log
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM logs where logid= %s", [str(logid)])
+    cur.execute("DELETE FROM Logs where logid= %s", [str(logid)])
 
     mysql.connection.commit()
     cur.close()
@@ -519,7 +519,7 @@ def trainer_all_plans(user_id, plan_info=None):
         'f.MealPlanID, f.WorkoutPlanID '
         'FROM FitnessProgram f, Users u WHERE f.TrainerID = u.UserID')
     result = cur.fetchall()
-    
+
     plan_info = result
     cur.close()
     return render_template('trainer/browse_plans.html', plan_info=plan_info, user_id=user_id, count=count)
@@ -562,12 +562,39 @@ def trainer_plans(user_id):
             'SELECT * '
             'FROM WorkoutPlan w')
         workout_plans = cur.fetchall()
-        
+
         plan_info = result
         cur.close()
         return render_template('trainer/trainer_plans.html', plan_info=plan_info, user_id=user_id,
                                meal_plans=meal_plans,
                                workout_plans=workout_plans)
+
+
+@app.route("/trainer/<int:user_id>/programs/<int:program_id>")
+def trainer_plan_detail(user_id, program_id):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        'SELECT f.FitnessProgramName, f.Description, f.Program_Length '
+        'FROM FitnessProgram f WHERE f.FitnessProgramID = %s ', (program_id,))
+    program_details = cur.fetchone()
+    cur.execute(
+        'SELECT COUNT(c.UserID) '
+        'FROM FitnessProgram f, Clients c WHERE f.FitnessProgramID = %s '
+        'AND f.FitnessProgramID = c.Current_FitnessProgram', (program_id,))
+    client_count = cur.fetchone()
+    cur.execute(
+        'SELECT c.UserID, u.UserName, COUNT(l.LogID), u.Gender, u.Age '
+        'FROM FitnessProgram f, Clients c, Logs l, Users u '
+        'WHERE f.FitnessProgramID = %s AND f.FitnessProgramID = c.Current_FitnessProgram AND '
+        'c.UserID = u.UserID AND l.UserID = c.UserID AND l.FitnessProgramID = f.FitnessProgramID '
+        'GROUP BY c.UserID '
+        'ORDER BY COUNT(l.LogID)',
+        (program_id,))
+    client_details = cur.fetchall()
+    print(client_details)
+    cur.close()
+    return render_template('trainer/plan_details.html', user_id=user_id, program_details=program_details,
+                           client_details=client_details, client_count=client_count)
 
 
 @app.route("/trainer/<int:user_id>/meal_plans/")
@@ -580,12 +607,12 @@ def trainer_meal_plans(user_id):
         'm.MealPlanID = f.MealPlanID AND u.UserID = %s', [str(user_id)])
     result = cur.fetchall()
     print(result)
-    
+
     plan_info = result
     cur.close()
     return render_template('trainer/meal_plans.html', meal_plan_info=plan_info, user_id=user_id)
 
-#Creating a new meal plan 
+#Creating a new meal plan
 
 class MealPlanForm(Form):
     mealplanname = StringField('mealplanname', [
@@ -599,7 +626,7 @@ class MealPlanForm(Form):
         validators.Length(min=1, max=50)])
     mealplandescription = StringField('mealplandescription', [
         validators.DataRequired(),
-        validators.Length(min=1, max=400)])  
+        validators.Length(min=1, max=400)])
 
 
 @app.route("/trainer/<int:user_id>/create_mealplan/", methods=['GET','POST'])
@@ -620,7 +647,7 @@ def create_mealplan(user_id):
         if mealplan_check > 0:
             flash('The Meal Plan Name is already taken! Try another one', 'danger')
             return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
-        #Creating MealPlan 
+        #Creating MealPlan
         cur = mysql.connection.cursor()
         cur.execute(
             'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
@@ -640,7 +667,7 @@ def create_mealplan(user_id):
         return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
 
     return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
-    #ROUTE WORKS 
+    #ROUTE WORKS
 @app.route("/trainer/<int:user_id>/<int:mealplanid>/create_mealplan2/", methods=['GET','POST'])
 def create_mealplan2(user_id, mealplanid):
     if request.method == 'POST':
@@ -658,7 +685,7 @@ def create_mealplan2(user_id, mealplanid):
         else:
             cur.close()
             return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
-            
+
 
     else:
         #Display Meals
@@ -675,8 +702,8 @@ def create_mealplan2(user_id, mealplanid):
             cur.close()
             return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
             #return render_template('meals.html', msg=msg)
-        
-            
+
+
     return render_template('trainer/create_mealplan2.html', user_id=user_id, mealplanid=mealplanid)
 
 @app.route('/add_meal_to_mealplan/<user_id>/<string:mealplanid>/<string:mealid>', methods=['POST'])
@@ -718,7 +745,7 @@ def trainer_workout_plans(user_id):
         'f.FitnessProgramID FROM FitnessProgram f, WorkoutPlan w, Users u WHERE f.TrainerID = u.UserID AND '
         'w.WorkoutPlanID = f.WorkoutPlanID AND u.UserID = %s', [str(user_id)])
     result = cur.fetchall()
-    
+
     plan_info = result
     cur.close()
     return render_template('trainer/workout_plans.html', workout_plan_info=plan_info, user_id=user_id)
@@ -933,7 +960,6 @@ def trainers_search():
             return render_template('trainers.html', msg=msg)
 
 
-
 # Route for single trainer
 @app.route("/trainer_search/<string:UserID>/")
 def trainer_search(UserID):
@@ -950,7 +976,6 @@ def trainer_search(UserID):
     else:
         msg = "No trainers Found"
         return render_template('trainers.html', msg=msg)
-
 
 
 # Note: This is in debug mode. This means that it restarts with changes
