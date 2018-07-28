@@ -57,6 +57,12 @@
                                         <td>{{ workout['Intensity'] }}</td>
                                         <td>{{ workout['WorkoutDescription'] }}</td>
                                         <td>{{ workout['Equipment'] }}</td>
+                                        <td>
+                                            <form action="#" method="post">
+                                                <input type="hidden" name="_method" value="ADD">
+                                                <input type="submit" value="ADD" class="btn btn-success" >
+                                            </form>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
