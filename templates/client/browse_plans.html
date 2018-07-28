@@ -1,45 +1,10 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 <!-TODO: Replace client with User name ->
 {% block title %}Client - Dashboard{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
-{% endblock %}
-
-{% block nav_items %}
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('client', user_id=user_id) }}">Dashboard</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('client_logs', user_id=user_id) }}">Logs</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ url_for('client_browse_plans', user_id=user_id) }}">Program</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ request.base_url }}meal_plans">Meal Plan</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ request.base_url }}workout_plans">Workout Plan</a>
-    </li>
-{% endblock %}
-
-{% block nav_items_right %}
-    <li class="nav-item">
-        <a class="nav-link" href="/#">Logout</a>
-    </li>
-
-    <li class="nav-item dropdown">
-        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
-        <span class="caret"></span>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
-            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
-            <li><a class="dropdown-item" href="/meals">Meals</a></li>
-            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
-        </ul>
-    </li>
 {% endblock %}
 
 {% block body %}
