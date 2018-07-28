@@ -685,7 +685,7 @@ def create_workout_plan2(user_id, workoutplanid):
             return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
         else:
             cur.close()
-            return redirect(url_for('create_create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+            return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
         return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
     else:
         #Display Workouts
