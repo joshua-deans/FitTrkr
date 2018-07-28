@@ -173,7 +173,12 @@ class SignupForm(Form):
         validators.EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [
         validators.DataRequired()])
-
+    firstname = StringField('First Name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)])
+    lastname = StringField('Last Name', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=30)])
 
 # Route for sign up form
 
@@ -185,7 +190,8 @@ def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
-        # Checks to see if username already exists
+        firstname = form.firstname.data
+        lastname = form.lastname.data
         client_trainer_option = request.form['trainer_client_radio']
         # Checks to see if username already exists
         cur = mysql.connect.cursor()
@@ -205,8 +211,8 @@ def signup():
         b64_hash = base64.b64encode(password_hash)
         cur = mysql.connection.cursor()
         cur.execute(
-            'INSERT INTO Users(UserName, PasswordHash, PasswordSalt) VALUES (%s, %s, %s)',
-            (username, b64_hash, b64_salt))
+            'INSERT INTO Users(UserName,Firstname, Lastname, PasswordHash, PasswordSalt) VALUES (%s,%s,%s, %s, %s)',
+            (username, firstname, lastname, b64_hash, b64_salt))
         if client_trainer_option == 'trainer':
             cur.execute(
                 'INSERT INTO Trainers(UserID) VALUES (%s)',
@@ -239,7 +245,8 @@ class SettingsForm(Form):
     ])
     age = StringField('Age', [
         validators.DataRequired(),
-        validators.Length(min=1, max=11)
+        validators.Length(min=1, max=11),
+        validators.Regexp('^[0-9]*$', message='Please enter an integer')
     ])
     address = StringField('Address', [
         validators.DataRequired(),
@@ -247,7 +254,7 @@ class SettingsForm(Form):
     ])
     postal_code = StringField('Postal code', [
         validators.DataRequired(),
-        validators.Length(min=1, max=6)
+        validators.Length(min=1, max=6, message='No More than 6 CHAR')
     ])
     city = StringField('City', [
         validators.DataRequired(),
