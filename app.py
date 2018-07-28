@@ -618,7 +618,92 @@ def workouts():
             return render_template('workouts.html', msg=msg)
 
 
+class WorkOutPlanForm(Form):
+    workoutplanname = StringField('workoutplanname', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=100)])
+    intensity = StringField('intensity', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=50)])
+    plandescription = StringField('plandescription', [
+        validators.DataRequired(),
+        validators.Length(min=1, max=400)])  
 
+@app.route("/trainer/<int:user_id>/create_workoutplan/", methods=['GET','POST'])
+def create_workoutplan(user_id):
+    form = WorkOutPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #FORM FIELDS
+        workoutplanname = form.workoutplanname.data
+        intensity = form.intensity.data
+        plandescription = form.plandescription.data
+        #Check to see if workoutplan already exists 
+        cur = mysql.connection.cursor()
+        workoutplan_check = cur.execute(
+            'select * from workoutplan where workoutplanname = %s ', [workoutplanname]
+        )
+        if workoutplan_check > 0:
+            cur.close()
+            flash('The Work Out Plan Name is already taken! Try another one!', 'danger')
+            return render_template('trainer/workout_plans.html', user_id=user_id, form=form)
+        cur.close()
+        #SUCCESS name not taken, create plan
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT into workoutplan(workoutplanname, intensity, plandescription) '
+            'VALUES(%s,%s,%s)', (workoutplanname, intensity, plandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT * from workoutplan where workoutplanname = %s', [workoutplanname]
+        )
+        result = cur.fetchone()
+        workoutplan_id = result['WorkoutPlanID']
+        cur.close()
+        flash('Work Out Plan Created!', 'success')
+        return render_template('trainer/workout_plans.html', user_id=user_id)
+    return render_template('trainer/workout_plans.html', user_id=user_id)
+@app.route("/trainer/<int:user_id>/create_mealplan/", methods=['GET','POST'])
+def create_mealplan(user_id):
+    form = MealPlanForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #Form Fields
+        mealplanname = form.mealplanname.data
+        category = form.category.data
+        dietaryrestrictions = form.dietaryrestrictions.data
+        mealplandescription = form.mealplandescription.data
+        #Checking to see if a mealplan has that name
+        cur = mysql.connection.cursor()
+        mealplan_check = cur.execute(
+            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+        )
+        cur.close()
+        if mealplan_check > 0:
+            flash('The Meal Plan Name is already taken! Try another one', 'danger')
+            return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+        #Creating MealPlan 
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
+            'VALUES(%s,%s,%s,%s)', (mealplanname, category,dietaryrestrictions,mealplandescription)
+        )
+        mysql.connection.commit()
+        cur.close()
+        #Fetching MealPlanID
+        cur = mysql.connection.cursor()
+        cur.execute(
+            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+        )
+        result = cur.fetchone()
+        mealplanid = result['MealPlanID']
+        cur.close()
+        flash('Meal plan created! Go add some meals in!', 'success')
+        return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+
+    return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
+    #ROUTE WORKS 
 # Route for adding strength workouts
 @app.route("/add_strength_workout", methods=['POST'])
 def add_strength_workout():

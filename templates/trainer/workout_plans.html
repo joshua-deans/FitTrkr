@@ -46,9 +46,9 @@
     <div class="container-fluid">
         <h1 class="display-5" style="display: inline">Your Work Out Plans</h1>
         <td>
-            <form action="{{url_for('create_mealplan', user_id=user_id)}}" method="post">
+            <form action="{{url_for('create_workoutplan', user_id=user_id)}}" method="post">
                 <input type="hidden" name="_method" value="New Work Plan">
-                <input type="submit" value="New Meal Plan" class="btn btn-success" >
+                <input type="submit" value="New Work Out Plan" class="btn btn-success" >
 
             </form>
         </td>
