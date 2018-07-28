@@ -10,216 +10,217 @@ CREATE DATABASE if not exists fitTrkr;
 USE fitTrkr;
 
 CREATE TABLE MealPlan
-	(
-	MealPlanID    	INT(11) AUTO_INCREMENT,
-	MealPlanName 	VARCHAR(30),
-	Category    	VARCHAR(50),
-	DietaryRestrictions	 VARCHAR(200),
-	MealPlanDescription	 VARCHAR(500),
-	Primary Key(MealPlanID)
-	);
+    (
+    MealPlanID      INT(11) AUTO_INCREMENT,
+    MealPlanName    VARCHAR(30) UNIQUE,
+    Category        VARCHAR(50),
+    DietaryRestrictions  VARCHAR(200),
+    MealPlanDescription  VARCHAR(500),
+    Primary Key(MealPlanID)
+    );
 
 CREATE TABLE Meals
-	(
-	MealID INT(11) AUTO_INCREMENT,
-	MealType	VARCHAR(30),
-	MealName	VARCHAR(50),
-	CaloriesPerServing	INT,
-	DietaryRestrictions	VARCHAR(300),
-	MealDescription    	VARCHAR(500),
-	Primary Key(MealID)
-	);
+    (
+    MealID INT(11) AUTO_INCREMENT,
+    MealType    VARCHAR(30),
+    MealName    VARCHAR(50) UNIQUE,
+    CaloriesPerServing  INT,
+    DietaryRestrictions VARCHAR(300),
+    MealDescription     VARCHAR(500),
+    Primary Key(MealID)
+    );
 
 CREATE TABLE WorkoutPlan
-	(
-	WorkoutPlanID INT(11) AUTO_INCREMENT,
-	WorkoutPlanName VARCHAR(30),
-	Intensity    	VARCHAR(30),
-	PlanDescription	VARCHAR(500),
-	Primary Key (WorkoutPlanID)
-	);
+    (
+    WorkoutPlanID INT(11) AUTO_INCREMENT,
+    WorkoutPlanName VARCHAR(30) UNIQUE,
+    Intensity       VARCHAR(30),
+    PlanDescription VARCHAR(500),
+    Primary Key (WorkoutPlanID)
+    );
+
 CREATE TABLE Workouts
-	(
-	WorkoutID INT(11) AUTO_INCREMENT,
-	Intensity VARCHAR(30),
-	WorkoutDescription VARCHAR(500),
-	Equipment VARCHAR(300),
-	WorkoutName VARCHAR(140),
-	Primary Key (WorkoutID)
-	);
+    (
+    WorkoutID INT(11) AUTO_INCREMENT,
+    Intensity VARCHAR(30),
+    WorkoutDescription VARCHAR(500),
+    Equipment VARCHAR(300),
+    WorkoutName VARCHAR(140) UNIQUE,
+    Primary Key (WorkoutID)
+    );
 
 CREATE TABLE Cardio
-	(
-	WorkoutID INT(11) AUTO_INCREMENT,
-	Distance VARCHAR(30),
-	Duration VARCHAR(30),
-	CardioType VARCHAR(30),
-	Primary Key (WorkoutID),
-	Foreign Key(WorkoutID) references Workouts(WorkoutID)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-	);
+    (
+    WorkoutID INT(11) AUTO_INCREMENT,
+    Distance VARCHAR(30),
+    Duration VARCHAR(30),
+    CardioType VARCHAR(30),
+    Primary Key (WorkoutID),
+    Foreign Key(WorkoutID) references Workouts(WorkoutID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    );
 
 CREATE TABLE Strength
-	(
-	WorkoutID INT(11) AUTO_INCREMENT,
-	BodyPart VARCHAR(50),
-	StrengthType VARCHAR(30),
-	Primary Key (WorkoutID),
-	Foreign Key (WorkoutID) references Workouts(WorkoutID)
-	    ON DELETE CASCADE
-	    ON UPDATE CASCADE
-	);
+    (
+    WorkoutID INT(11) AUTO_INCREMENT,
+    BodyPart VARCHAR(50),
+    StrengthType VARCHAR(30),
+    Primary Key (WorkoutID),
+    Foreign Key (WorkoutID) references Workouts(WorkoutID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE MealPlan_Meal
-	(
-	MealPlanID INT(11) AUTO_INCREMENT,
-	MealPlanName VARCHAR(50),
-	MealID INT(11),
-	MealTime CHAR(50),
-	Primary Key(MealplanID, MealID),
-	Foreign Key(MealplanID) references MealPlan(MealplanID)
-		ON DELETE NO ACTION
-		ON UPDATE CASCADE,
-	Foreign Key(MealID) references Meals(MealID)
-		ON DELETE NO ACTION	
-		ON UPDATE CASCADE
-	);
+    (
+    MealPlanID INT(11) AUTO_INCREMENT,
+    MealPlanName VARCHAR(50),
+    MealID INT(11),
+    MealTime CHAR(50),
+    Primary Key(MealplanID, MealID),
+    Foreign Key(MealplanID) references MealPlan(MealplanID)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE,
+    Foreign Key(MealID) references Meals(MealID)
+        ON DELETE NO ACTION 
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE Workout_Comprise_WPlan
-	(
-	WorkoutPlanID INT(11),
-	WorkoutPlanName VARCHAR(50),
-	WorkOutID INT(11),
-	NumSets INT(11),
-	NumReps INT(11),
-	Primary Key(WorkoutPlanID, WorkOutID),
-	Foreign Key(WorkoutPlanID) references WorkoutPlan(WorkoutPlanID)
-		ON DELETE NO ACTION
+    (
+    WorkoutPlanID INT(11),
+    WorkoutPlanName VARCHAR(50) ,
+    WorkOutID INT(11),
+    NumSets INT(11),
+    NumReps INT(11),
+    Primary Key(WorkoutPlanID, WorkOutID),
+    Foreign Key(WorkoutPlanID) references WorkoutPlan(WorkoutPlanID)
+        ON DELETE NO ACTION
         ON UPDATE CASCADE,
-	Foreign Key(WorkOutID) references Workouts(WorkOutID)
-		ON DELETE NO ACTION
-		ON UPDATE CASCADE
-	);
+    Foreign Key(WorkOutID) references Workouts(WorkOutID)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE PostalCode
 (
-	PostalCode VARCHAR(6),
-	City VARCHAR(100),
-	ProvinceState VARCHAR(30),
-	Country VARCHAR(100),
-	Primary Key(PostalCode)
+    PostalCode VARCHAR(6),
+    City VARCHAR(100),
+    ProvinceState VARCHAR(30),
+    Country VARCHAR(100),
+    Primary Key(PostalCode)
 );
 
 CREATE TABLE Users
 (
-	UserID INT(11) AUTO_INCREMENT,
-	UserName VARCHAR(30) UNIQUE,
-	FirstName VARCHAR(30),
-	LastName VARCHAR(30),
-	PasswordHash CHAR(64),
-	PasswordSalt CHAR(32),
-	Gender VARCHAR(10),
-	Age INT(11),
-	Address VARCHAR(100),
-	PostalCode VARCHAR(6),
-	Primary Key (UserID),
-	Foreign Key(PostalCode) references PostalCode(PostalCode)
-		ON DELETE NO ACTION 
-		ON UPDATE CASCADE
-	);
+    UserID INT(11) AUTO_INCREMENT,
+    UserName VARCHAR(30) UNIQUE,
+    FirstName VARCHAR(30),
+    LastName VARCHAR(30),
+    PasswordHash CHAR(64),
+    PasswordSalt CHAR(32),
+    Gender VARCHAR(10),
+    Age INT(11),
+    Address VARCHAR(100),
+    PostalCode VARCHAR(6),
+    Primary Key (UserID),
+    Foreign Key(PostalCode) references PostalCode(PostalCode)
+        ON DELETE NO ACTION 
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE Session
 (
-	UserID INT(11) AUTO_INCREMENT,
-	Token CHAR(128),
-	Primary Key (UserID, Token),
-	Foreign Key(UserID) references Users(UserID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-	);
+    UserID INT(11) AUTO_INCREMENT,
+    Token CHAR(128),
+    Primary Key (UserID, Token),
+    Foreign Key(UserID) references Users(UserID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE Trainers
     (
-	UserID INT(11),
-	TrainerFocus VARCHAR(300),
-	Primary Key (UserID),
-	Foreign Key(UserID) references Users(UserID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-	);
+    UserID INT(11),
+    TrainerFocus VARCHAR(300),
+    Primary Key (UserID),
+    Foreign Key(UserID) references Users(UserID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE FitnessProgram
-	(
-	FitnessProgramID INT(11) AUTO_INCREMENT,
-	FitnessProgramName VARCHAR(30),
-	FP_intensity VARCHAR(50),
-	Description VARCHAR(400),
-	Program_Length VARCHAR(20),
-	TrainerID INT(11),
-	WorkoutPlanID INT NOT NULL,
-	MealPlanID INT NOT NULL,
-	Primary Key (FitnessProgramID),
-	Foreign Key (TrainerID) references Users(UserID)
-		ON DELETE SET NULL
-		ON UPDATE CASCADE,
-	Foreign Key(WorkoutPlanID) references WorkoutPlan(WorkoutPlanID)
-		ON DELETE NO ACTION
-		ON UPDATE CASCADE,
-	Foreign Key(MealPlanID) references MealPlan(MealPlanID)
-		ON DELETE NO ACTION
+    (
+    FitnessProgramID INT(11) AUTO_INCREMENT,
+    FitnessProgramName VARCHAR(30) UNIQUE,
+    FP_intensity VARCHAR(50),
+    Description VARCHAR(400),
+    Program_Length VARCHAR(20),
+    TrainerID INT(11),
+    WorkoutPlanID INT NOT NULL,
+    MealPlanID INT NOT NULL,
+    Primary Key (FitnessProgramID),
+    Foreign Key (TrainerID) references Users(UserID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    Foreign Key(WorkoutPlanID) references WorkoutPlan(WorkoutPlanID)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE,
+    Foreign Key(MealPlanID) references MealPlan(MealPlanID)
+        ON DELETE NO ACTION
         ON UPDATE CASCADE
-	);
+    );
 
 CREATE TABLE Clients
 (
-	UserID INT(11),
-	Height DOUBLE,
-	Weight DOUBLE,
-	PrimaryGoals VARCHAR(300),
-	FitnessLevel VARCHAR(140),
-	Current_FitnessProgram INT(11),
-	Primary Key(UserID),
-	Foreign Key(UserID) references Users(UserID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	Foreign Key(Current_FitnessProgram) references FitnessProgram(FitnessProgramID)
-	    ON DELETE CASCADE
-	    ON UPDATE CASCADE
-	);
+    UserID INT(11),
+    Height DOUBLE,
+    Weight DOUBLE,
+    PrimaryGoals VARCHAR(300),
+    FitnessLevel VARCHAR(140),
+    Current_FitnessProgram INT(11),
+    Primary Key(UserID),
+    Foreign Key(UserID) references Users(UserID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    Foreign Key(Current_FitnessProgram) references FitnessProgram(FitnessProgramID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+    );
 
 CREATE TABLE Logs
-	(
-	UserID INT(11) NOT NULL,
-	LogID INT(11) AUTO_INCREMENT,
-	FitnessProgramID INT NOT NULL,
-	LogDate DATE,
-	Weight DOUBLE,
-	WorkoutCompletion INT(11),
-	Notes VARCHAR(1000),
-	SatisfactionLevel INT(11),
-	MealCompletion INT(11),
-	Primary Key(LogID),
-	Foreign Key(UserID) references Users(UserID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	Foreign Key(FitnessProgramID) references FitnessProgram(FitnessProgramID)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION
-	);
+    (
+    UserID INT(11) NOT NULL,
+    LogID INT(11) AUTO_INCREMENT,
+    FitnessProgramID INT NOT NULL,
+    LogDate DATE,
+    Weight DOUBLE,
+    WorkoutCompletion INT(11),
+    Notes VARCHAR(1000),
+    SatisfactionLevel INT(11),
+    MealCompletion INT(11),
+    Primary Key(LogID),
+    Foreign Key(UserID) references Users(UserID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    Foreign Key(FitnessProgramID) references FitnessProgram(FitnessProgramID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+    );
 
 CREATE TABLE Preq_Fitness
-	(
-	PrereqProgramID INT(11) AUTO_Increment,
-	FitnessProgramID INT(11),
-	Primary key (PrereqProgramID, FitnessProgramID),
-	Foreign key(PrereqProgramID) references FitnessProgram(FitnessProgramID)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION,
-	Foreign key(FitnessProgramID) references FitnessProgram(FitnessProgramID)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION
-	);
+    (
+    PrereqProgramID INT(11) AUTO_Increment,
+    FitnessProgramID INT(11),
+    Primary key (PrereqProgramID, FitnessProgramID),
+    Foreign key(PrereqProgramID) references FitnessProgram(FitnessProgramID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    Foreign key(FitnessProgramID) references FitnessProgram(FitnessProgramID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+    );
 
 INSERT INTO PostalCode
 VALUES
@@ -252,8 +253,17 @@ VALUES
     (2, 'Weight Gain/Bulk', 'Steak and Eggs', 1000, 'Ketogenic', 'Pan sear any filet of beef that you’d like. \nPan fry two eggs in butter'),
     (3, 'Weight Loss', 'Beet and Ricotta Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in arugula.'),
     (4, 'Weight Gain/Bulk', 'Braised Pork Poutine', 890, ' ', 'Slow braise pork.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
-    (5, 'Weight Loss', 'Apple Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' );
-
+    (5, 'Weight Loss', 'Apple Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' ),
+    (6, 'Weight Loss', 'Lamb and Rice', 1500, ' ', 'Pan fry a lamb breast.\n Cook basmati rice in boiling water'),
+    (7, 'Weight Gain/Bulk', 'Salmon and Eggs', 800, 'Ketogenic', 'Pan sear any filet of salmon that you’d like. \nPan fry two eggs in butter'),
+    (8, 'Weight Loss', 'Beet and Feet Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in severed feet.'),
+    (9, 'Weight Gain/Bulk', 'Braised Beef Heart Poutine', 490, ' ', 'Slow braise beef heart.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
+    (10, 'Weight Loss', 'Keep Salad', 200, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Apples.\nPut in bowl.\n' ),
+    (11, 'Weight Loss', 'Johnny Pork and Rice', 700, ' ', 'Pan fry a Johnny breast.\n Cook basmati rice in boiling water'),
+    (12, 'Weight Gain/Bulk', 'Trout and Eggs', 800, 'Ketogenic', 'Pan sear any filet of salmon that you’d like. \nPan fry two eggs in butter'),
+    (13, 'Weight Loss', 'Beet and Pork Salad', 350, 'Vegetarian', 'Peel and Roast Beets.\nWhip ricotta with parsley and mint.\nThrow in severed feet.'),
+    (14, 'Weight Gain/Bulk', 'Braised jonny Poutine', 490, ' ', 'Slow braise beef heart.\nDeep fry potatoes cut in desired shape.\nCover Fries in Store Bought Gravy and Cheese Curds.\nAdd slow braised pork'),
+    (15, 'Weight Loss', 'Feet Salad', 700, 'Vegetarian, Vegan, Lactose Intolerant', 'Cut Feet.\nPut in bowl.\n' );
 
 INSERT INTO MealPlan
 VALUES
@@ -274,7 +284,12 @@ VALUES
     (7, 'Easy', 'Get down on all fours.\nWalk by moving forward with hands then feet.', 'None', 'Crawl'),
     (8, 'Easy', 'Jump in air.\nSpread legs and arms like eagle', 'None', 'Jumping Jack'),
     (9, 'Easy', 'Jump in air.\nTuck knees in at peak', 'None', 'Knee Tucks'),
-    (10, 'Easy', 'Jump in air.\nReach up as high as you can with one hand','None', 'High Jump');
+    (10, 'Med', 'Jump in air.\nReach up as med as you can with one hand','None', 'med Jump'),
+    (11, 'Easy', 'Move legs forward briskly but not too briskly', 'None', 'Speed walking'),
+    (12, 'Med', 'Get down on all three.\nWalk by moving forward with hand then feet.', 'None', 'Baby Crawl'),
+    (13, 'Easy', 'Jump in air.\nSpread legs and arms like eagle', 'None', 'Small Jack'),
+    (14, 'Med', 'Jump in pool.\nTuck knees in at peak', 'None', 'Canon Ball'),
+    (15, 'Easy', 'Jump in air.\nReach up as low as you can with one hand','None', 'small Jump');
 
 INSERT INTO WorkoutPlan
 VALUES
@@ -299,7 +314,13 @@ VALUES
     (3,'Oprah for President','Medium','Love yourself','4 weeks',7,2,2),
     (4,'The Tony workout itsss great','High','Become a fierce Tiger','10 weeks',8,5,4),
     (5,'Dragon child', 'High','Dragon Penultimate Form','10 weeks',9,3,4),
-    (6,'Rainbow 6 for chicks','High','Unicorn Final Form','15 weeks',10,5,5);
+    (6,'Rainbow 6 for chicks','High','Unicorn Final Form','15 weeks',10,5,5),
+    (7,'Killer Mikes Sweat', 'High','Damnnnnn','8 weeks',10, 1, 1),
+    (8,'Dani Storms fitness','Low','You too can be famous','9 weeks',10, 4, 1),
+    (9,'The Rock for President','Medium','Can you smell what im sweating','3 weeks',10,2,2),
+    (10,'The Grunt','High','The guy that no one wants to be at the gym','4 weeks',10,5,4),
+    (11,'Unicorn is my spirit animal', 'High','ITS SO FLUFFYYYYYY','6 weeks',10,3,4),
+    (12,'No land for wimps','High','Hard as hell','12 weeks',10,5,5);
 
 INSERT INTO Clients
 VALUES
@@ -356,4 +377,3 @@ VALUES
     (3,3,'2018-07-01',3000.2,8,'feeling gross', 2,1),
     (4,4,'2018-08-01',120.4 ,10,'So bad, but so good',4,1),
     (5,5,'2018-09-01',250.6,10,'I love my body',10 ,10);
-
