@@ -675,7 +675,7 @@ def create_workout_plan2(user_id, workoutplanid):
         workoutnamepassed = '%' + workoutname + '%'
         cur = mysql.connection.cursor()
         result = cur.execute(
-            'select * from workouts where workoutname like %s', [workoutname]
+            'select * from workouts where workoutname like %s', [workoutnamepassed]
         )
         workouts = cur.fetchall()
 
