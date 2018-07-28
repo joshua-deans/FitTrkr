@@ -36,22 +36,30 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Recent Fitness Plans</b></div>
+                    <div class="card-header"><b>Fitness Programs</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Plan 1</li>
-                        <li class="list-group-item">Plan 2</li>
-                        <li class="list-group-item">Plan 3</li>
+                        {% if programs %}
+                            {% for program in programs %}
+                                <li class="list-group-item">{{ program.FitnessProgramName }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">No programs</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <br>
             </div>
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Recent Clients</b></div>
+                    <div class="card-header"><b>Clients</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">John Doe</li>
-                        <li class="list-group-item">Jane Doe</li>
-                        <li class="list-group-item">Bill Bob</li>
+                        {% if clients %}
+                            {% for client in clients %}
+                                <li class="list-group-item">{{ client.FirstName }} {{ client.LastName }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">No clients</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <br>
@@ -59,11 +67,15 @@
             <br>
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header"><b>Recent Logs</b></div>
+                    <div class="card-header"><b>Logs</b></div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Log 44</li>
-                        <li class="list-group-item">Log 43</li>
-                        <li class="list-group-item">Log 42</li>
+                        {% if logs %}
+                            {% for log in logs %}
+                                <li class="list-group-item">Log {{ log.LogID }}: Satisfaction: {{ log.SatisfactionLevel }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">No logs</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <br>
