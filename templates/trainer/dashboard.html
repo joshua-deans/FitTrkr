@@ -17,6 +17,23 @@
         </div>
         <br>
         <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header"><b>Your Superstars</b> <i>These clients have submitted logs in all of your fitness programs</i></div>
+                    <ul class="list-group list-group-flush">
+                        {% if superstars %}
+                            {% for client in superstars %}
+                                <li class="list-group-item">{{ client.FirstName }} {{ client.LastName }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">No Superstars!</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <br>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header"><b>Recent Fitness Plans</b></div>

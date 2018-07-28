@@ -523,9 +523,26 @@ def trainer(user_id):
         'SELECT * '
         'FROM Users u WHERE u.UserID = %s AND u.UserID IN (SELECT UserID FROM Trainers)', (user_id,))
     result = cur.fetchone()
+    # Division query: Find all clients who are taking all of the trainer's programs (Superstars)
+    cur.execute(
+        'SELECT u.FirstName, u.LastName '
+        'FROM Users u '
+        'WHERE NOT EXISTS( '
+        '  SELECT * '
+        '  FROM FitnessProgram f '
+        '  WHERE NOT EXISTS( '
+        '    SELECT * '
+        '    FROM Logs l '
+        '    WHERE u.UserID = l.UserID AND '
+        '    l.FitnessProgramID = f.FitnessProgramID '
+        '  ) AND '
+        '  f.TrainerID = %s '
+        ')', (user_id,)
+    )
+    superstars = cur.fetchall()
     cur.close()
     if result:
-        return render_template('trainer/dashboard.html', user=result, user_id=user_id)
+        return render_template('trainer/dashboard.html', user=result, user_id=user_id, superstars=superstars)
     else:
         return redirect('/')
 
