@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+<!-TODO: Replace client with User name ->
+{% block title %}Create a Meal Plan{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/base_style.css') }}">
+{% endblock %}
+
+{% block nav_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer', user_id=user_id) }}">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_plans', user_id=user_id) }}">Program</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('trainer_meal_plans', user_id=user_id) }}">Meal Plan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('trainer_workout_plans', user_id=user_id) }}">Workout Plan</a>
+    </li>
+{% endblock %}
+
+{% block nav_items_right %}
+    <li class="nav-item">
+        <a class="nav-link" href="/#">Logout</a>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#">Search</a>
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <!-- Search all meals by Workout name, meal name, trainer
+            As you click each you see all the pages, then on the page
+            itself there is a search box that would run the query-->
+            <li><a class="dropdown-item" href="{{ request.base_url }}">Programs</a></li>
+            <li><a class="dropdown-item" href="/workouts">Workouts</a></li>
+            <li><a class="dropdown-item" href="/meals">Meals</a></li>
+            <li><a class="dropdown-item" href="/trainers">Trainers</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="display-5" style="display: inline">Create a Meal Plan</h1>
+        <br>
+        <br>
+		<div class="card-body">
+            {% from "includes/_formhelpers.html" import render_field %}
+            <form action="" method="post">
+                <div class="form-group">
+                    {{render_field(form.workoutplanname, class_="form-control")}}
+                </div>
+                <div class="form-group">
+                    {{render_field(form.intensity, class_="form-control")}}
+                </div>
+                
+                <div class="form-group">
+                    {{render_field(form.plandescription, class_="form-control")}}
+                </div>
+                <button class="btn btn-primary">Submit</button>
+            </form>
+		</div>
+    </div>
+{% endblock %}

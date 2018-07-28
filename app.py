@@ -660,50 +660,14 @@ def create_workoutplan(user_id):
             'SELECT * from workoutplan where workoutplanname = %s', [workoutplanname]
         )
         result = cur.fetchone()
-        workoutplan_id = result['WorkoutPlanID']
+        workoutplanid = result['WorkoutPlanID']
         cur.close()
         flash('Work Out Plan Created!', 'success')
-        return render_template('trainer/workout_plans.html', user_id=user_id)
-    return render_template('trainer/workout_plans.html', user_id=user_id)
-@app.route("/trainer/<int:user_id>/create_mealplan/", methods=['GET','POST'])
-def create_mealplan(user_id):
-    form = MealPlanForm(request.form)
-    if request.method == 'POST' and form.validate():
-        #Form Fields
-        mealplanname = form.mealplanname.data
-        category = form.category.data
-        dietaryrestrictions = form.dietaryrestrictions.data
-        mealplandescription = form.mealplandescription.data
-        #Checking to see if a mealplan has that name
-        cur = mysql.connection.cursor()
-        mealplan_check = cur.execute(
-            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
-        )
-        cur.close()
-        if mealplan_check > 0:
-            flash('The Meal Plan Name is already taken! Try another one', 'danger')
-            return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
-        #Creating MealPlan 
-        cur = mysql.connection.cursor()
-        cur.execute(
-            'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
-            'VALUES(%s,%s,%s,%s)', (mealplanname, category,dietaryrestrictions,mealplandescription)
-        )
-        mysql.connection.commit()
-        cur.close()
-        #Fetching MealPlanID
-        cur = mysql.connection.cursor()
-        cur.execute(
-            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
-        )
-        result = cur.fetchone()
-        mealplanid = result['MealPlanID']
-        cur.close()
-        flash('Meal plan created! Go add some meals in!', 'success')
-        return redirect(url_for('create_mealplan2', user_id=user_id, mealplanid = mealplanid))
+        return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
+    return render_template('trainer/create_workout_plan.html', user_id=user_id,form=form)
 
-    return render_template('trainer/create_mealplan.html', user_id=user_id,form=form)
-    #ROUTE WORKS 
+
+
 # Route for adding strength workouts
 @app.route("/add_strength_workout", methods=['POST'])
 def add_strength_workout():
