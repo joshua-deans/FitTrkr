@@ -650,8 +650,10 @@ def trainer(user_id):
         'WHERE TrainerID = %s',
         (user_id,)
     )
+    programs = None
     superstars = None
     if num_programs > 0:
+        programs = cur.fetchall()
         cur.execute(
             'SELECT u.FirstName, u.LastName '
             'FROM Users u '
@@ -668,9 +670,30 @@ def trainer(user_id):
             ')', (user_id,)
         )
         superstars = cur.fetchall()
+    clients = None
+    num_clients = cur.execute(
+        'SELECT u.FirstName, u.LastName '
+        'FROM Users u, Logs l, FitnessProgram f '
+        'WHERE u.UserID = l.UserID AND '
+        'l.FitnessProgramID = f.FitnessProgramID AND '
+        'f.TrainerID = %s', (user_id,)
+    )
+    if num_clients > 0:
+        clients = cur.fetchall()
+    logs = None
+    num_logs = cur.execute(
+        'SELECT l.LogID, l.SatisfactionLevel '
+        'FROM Logs l, FitnessProgram f '
+        'WHERE l.FitnessProgramID = f.FitnessProgramID AND '
+        'f.TrainerID = %s', (user_id,)
+    )
+    if num_logs > 0:
+        logs = cur.fetchall()
     cur.close()
     if result:
-        return render_template('trainer/dashboard.html', user=result, user_id=user_id, superstars=superstars)
+        return render_template('trainer/dashboard.html',
+                               user=result, user_id=user_id, superstars=superstars,
+                               programs=programs, clients=clients, logs=logs)
     else:
         return redirect('/')
 
@@ -1033,7 +1056,6 @@ def create_workout_plan2(user_id, workoutplanid):
             flash("No Matches Found", 'danger')
             cur.close()
             return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
-        return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
     else:
         #Display Workouts
         cur = mysql.connection.cursor()
@@ -1049,9 +1071,7 @@ def create_workout_plan2(user_id, workoutplanid):
             cur.close()
             return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
             #return render_template('meals.html', msg=msg)
-        
-            
-    return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
+
 
   
 @app.route('/add_workout_to_workoutplan/<user_id>/<string:workoutplanid>/<string:workoutid>', methods=['POST'])
