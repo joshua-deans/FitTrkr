@@ -684,6 +684,7 @@ def create_workout_plan2(user_id, workoutplanid):
             cur.close()
             return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid = workoutplanid, workouts=workouts)
         else:
+            flash("No Matches Found", 'danger')
             cur.close()
             return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
         return render_template('trainer/create_workout_plan2.html', user_id=user_id,workoutplanid = workoutplanid)
@@ -735,7 +736,7 @@ def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
     mysql.connection.commit()
     cur.close()
     flash("Workout has been added to your workoutplan!", 'success')
-    return render_template('trainer/create_workout_plan2.html', user_id=user_id, workoutplanid=workoutplanid)
+    return redirect(url_for('create_workout_plan2', user_id=user_id, workoutplanid = workoutplanid))
 
 
 # Route for adding strength workouts
