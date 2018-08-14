@@ -726,7 +726,7 @@ def trainer(user_id):
         superstars = cur.fetchall()
     clients = None
     num_clients = cur.execute(
-        'SELECT u.FirstName, u.LastName '
+        'SELECT DISTINCT u.FirstName, u.LastName '
         'FROM Users u, Logs l, FitnessProgram f '
         'WHERE u.UserID = l.UserID AND '
         'l.FitnessProgramID = f.FitnessProgramID AND '
@@ -838,7 +838,7 @@ def trainer_plan_detail(user_id, program_id):
         'WHERE f.FitnessProgramID = %s AND f.FitnessProgramID = c.Current_FitnessProgram AND '
         'c.UserID = u.UserID AND l.UserID = c.UserID AND l.FitnessProgramID = f.FitnessProgramID '
         'GROUP BY c.UserID '
-        'ORDER BY COUNT(l.LogID)',
+        'ORDER BY COUNT(l.LogID) DESC',
         (program_id,))
     client_details = cur.fetchall()
     print(client_details)
@@ -894,7 +894,7 @@ def create_mealplan(user_id):
         #Checking to see if a mealplan has that name
         cur = mysql.connection.cursor()
         mealplan_check = cur.execute(
-            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+            'SELECT * from MealPlan where MealPlanName = %s', [mealplanname]
         )
         cur.close()
         if mealplan_check > 0:
@@ -903,7 +903,7 @@ def create_mealplan(user_id):
         #Creating MealPlan
         cur = mysql.connection.cursor()
         cur.execute(
-            'INSERT INTO mealplan(mealplanname, category, dietaryrestrictions, mealplandescription) '
+            'INSERT INTO MealPlan(MealPlanName, Category, DietaryRestrictions, MealPlanDescription) '
             'VALUES(%s,%s,%s,%s)', (mealplanname, category,dietaryrestrictions,mealplandescription)
         )
         mysql.connection.commit()
@@ -911,7 +911,7 @@ def create_mealplan(user_id):
         #Fetching MealPlanID
         cur = mysql.connection.cursor()
         cur.execute(
-            'SELECT * from mealplan where mealplanname = %s', [mealplanname]
+            'SELECT * from MealPlan where MealPlanName = %s', [mealplanname]
         )
         result = cur.fetchone()
         mealplanid = result['MealPlanID']
@@ -963,7 +963,7 @@ def add_meal_2_mealplan(user_id,mealplanid,mealid):
     #check if meal in mealplan
     cur = mysql.connection.cursor()
     result = cur.execute(
-        'select * from MealPlan_Meal where mealplanid = %s AND mealid = %s',(mealplanid,mealid)
+        'select * from MealPlan_Meal where MealPlanID = %s AND MealID = %s', (mealplanid, mealid)
     )
     if result > 0:
         flash("You already added this meal", 'danger')
@@ -973,7 +973,7 @@ def add_meal_2_mealplan(user_id,mealplanid,mealid):
     #Let's add meal to mealplan
     cur = mysql.connection.cursor()
     cur.execute(
-        'select * from MealPlan where mealplanid = %s', [mealplanid]
+        'select * from MealPlan where MealPlanID = %s', [mealplanid]
     )
     result = cur.fetchone()
     mealplanname = result['MealPlanName']
@@ -1063,7 +1063,7 @@ def create_workoutplan(user_id):
         #Check to see if workoutplan already exists 
         cur = mysql.connection.cursor()
         workoutplan_check = cur.execute(
-            'select * from workoutplan where workoutplanname = %s ', [workoutplanname]
+            'select * from WorkoutPlan where WorkoutPlanName = %s ', [workoutplanname]
         )
         if workoutplan_check > 0:
             cur.close()
@@ -1073,14 +1073,14 @@ def create_workoutplan(user_id):
         #SUCCESS name not taken, create plan
         cur = mysql.connection.cursor()
         cur.execute(
-            'INSERT into workoutplan(workoutplanname, intensity, plandescription) '
+            'INSERT into WorkoutPlan(WorkoutPlanName, Intensity, PlanDescription) '
             'VALUES(%s,%s,%s)', (workoutplanname, intensity, plandescription)
         )
         mysql.connection.commit()
         cur.close()
         cur = mysql.connection.cursor()
         cur.execute(
-            'SELECT * from workoutplan where workoutplanname = %s', [workoutplanname]
+            'SELECT * from WorkoutPlan where WorkoutPlanName = %s', [workoutplanname]
         )
         result = cur.fetchone()
         workoutplanid = result['WorkoutPlanID']
@@ -1098,7 +1098,7 @@ def create_workout_plan2(user_id, workoutplanid):
         workoutnamepassed = '%' + workoutname + '%'
         cur = mysql.connection.cursor()
         result = cur.execute(
-            'select * from workouts where workoutname like %s', [workoutnamepassed]
+            'select * from Workouts where WorkoutName like %s', [workoutnamepassed]
         )
         workouts = cur.fetchall()
 
@@ -1113,7 +1113,7 @@ def create_workout_plan2(user_id, workoutplanid):
     else:
         #Display Workouts
         cur = mysql.connection.cursor()
-        result = cur.execute("select * from workouts")
+        result = cur.execute("select * from Workouts")
         workouts = cur.fetchall()
 
         if result > 0:
@@ -1133,7 +1133,7 @@ def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
     #Check if workout is in workoutplan
     cur = mysql.connection.cursor()
     result = cur.execute(
-        'select * from Workout_Comprise_WPlan where workoutplanid = %s and workoutid = %s', [workoutplanid, workoutid]
+        'select * from Workout_Comprise_WPlan where WorkoutPlanID = %s and WorkOutID = %s', [workoutplanid, workoutid]
     )
     if result > 0:
         flash("You've already added this workout!", 'danger')
@@ -1143,7 +1143,7 @@ def add_workout_2_workoutplan(user_id,workoutplanid,workoutid):
     #Workout does not exist in Workoutplan, lets add. First find workoutplan name
     cur = mysql.connection.cursor()
     cur.execute(
-        'select * from WorkoutPlan where workoutplanid = %s', [workoutplanid]
+        'select * from WorkoutPlan where WorkoutPlanID = %s', [workoutplanid]
     )
     result = cur.fetchone()
     workoutplanname = result['WorkoutPlanName']
