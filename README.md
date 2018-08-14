@@ -1,5 +1,7 @@
 # fitTrkr
-This is a Fitness and Workout Tracking app called fitTrkr using [Flask](https://github.com/pallets/flask) Backend with MySQL from Scratch. 
+fitTrkr is a Fitness and Workout Tracking app called fitTrkr using [Flask](https://github.com/pallets/flask) Backend with MySQL from scratch. My group developed this web app for CMPT 354 (Database Systems I) in Summer 2018. 
+
+The purpose of this project was to design a database for an application by creating an entity-relation diagram and conceptual schemas, normalizing those schemas, and use the corresponding database for an application. This application then uses raw SQL queries with a database. At the end of the summer term, we demonstrated this application to the course TA, who gave us over 100% (with bonus marks)!
 
 =====
 
@@ -8,7 +10,7 @@ This is a Fitness and Workout Tracking app called fitTrkr using [Flask](https://
 ..* pip
 ..* MySQL
 
-###Setting up the Project
+### Setting up the Project
 Fork the repository and cd into to Project Directory
 1. pip install flask
 2. pip install flask_mysqldb
@@ -44,6 +46,7 @@ CREATE TABLE MealPlan
 ```
 
 ```
+
 CREATE TABLE Meals
 	(
 	MealID INT(11) AUTO_INCREMENT,
