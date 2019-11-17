@@ -1,7 +1,7 @@
 # fitTrkr
-fitTrkr is a Fitness and Workout Tracking app called fitTrkr using [Flask](https://github.com/pallets/flask) Backend with MySQL from scratch. My group developed this web app for CMPT 354 (Database Systems I) in Summer 2018. 
+fitTrkr is a fitness- and workout-tracking application that is supported by [Flask](https://github.com/pallets/flask) and MySQL in the back-end. My group developed this web application for CMPT 354 (Database Systems I) during the Summer, 2018 semester. 
 
-The purpose of this project was to design a database for an application by creating an entity-relation diagram and conceptual schemas, normalizing those schemas, and use the corresponding database for an application. This application then uses raw SQL queries with a database. At the end of the summer term, we demonstrated this application to the course TA, who gave us over 100% (with bonus marks)!
+The purpose of this project was to design an application database based on an entity-relation diagram and conceptual schemas. This application uses raw SQL queries to search the database. At the end of the summer term, we demonstrated this application to the course TA, who gave us over 100% (with bonus marks)!
 
 =====
 
